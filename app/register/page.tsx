@@ -9,23 +9,59 @@ import { useStore } from '@/hooks/useStore';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Eye, EyeOff } from 'lucide-react';
+import { validators, validateField } from '@/lib/validation';
 
 export default function Register() {
   const router = useRouter();
   const { login } = useAuth();
   const [users, setUsers] = useStore('career_users', mockUsers);
   const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '', phone: '' });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showPwd, setShowPwd] = useState(false);
-  const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+
+  const validationRules = {
+    username: (value: string) => validators.username(value),
+    email: (value: string) => validators.email(value),
+    phone: (value: string) => validators.phone(value),
+    password: (value: string) => validators.password(value),
+    confirmPassword: (value: string, allValues?: Record<string, string>) =>
+      validators.confirmPassword(value, allValues?.password || ''),
+  };
+
+  const validate = (name: string, value: string) => {
+    const error = validateField(name, value, validationRules, form);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    return error;
+  };
+
+  const handleChange = (name: string, value: string) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (touched[name]) {
+      validate(name, value);
+    }
+  };
+
+  const handleBlur = (name: string, value: string) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validate(name, value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    if (form.password !== form.confirmPassword) {
-      setError('两次输入的密码不一致');
+    setSubmitError('');
+    const allErrors: Record<string, string> = {};
+    Object.keys(validationRules).forEach((key) => {
+      const error = validateField(key, form[key as keyof typeof form], validationRules, form);
+      if (error) allErrors[key] = error;
+    });
+    setErrors(allErrors);
+    setTouched(Object.fromEntries(Object.keys(validationRules).map((k) => [k, true])));
+    if (Object.keys(allErrors).length > 0) {
+      setSubmitError('请修正表单中的错误');
       return;
     }
-    // 模拟注册
     const newUser = { id: 'u' + Date.now(), username: form.username, email: form.email, role: 'user' as const, createdAt: new Date().toISOString().split('T')[0], phone: form.phone };
     setUsers((prev) => [...prev, newUser]);
     login(newUser);
@@ -40,8 +76,8 @@ export default function Register() {
           <h1 className="mb-2 text-2xl font-bold">创建账号</h1>
           <p className="mb-6 text-sm text-muted-foreground">注册成为职引未来用户</p>
 
-          {error && (
-            <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
+          {submitError && (
+            <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">{submitError}</div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,22 +86,24 @@ export default function Register() {
               <input
                 id="username"
                 type="text"
-                required
                 value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => handleChange('username', e.target.value)}
+                onBlur={(e) => handleBlur('username', e.target.value)}
+                className={`w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.username ? 'border-destructive' : 'border-input'}`}
               />
+              {errors.username && <p className="mt-1 text-xs text-destructive">{errors.username}</p>}
             </div>
             <div>
               <label htmlFor="email" className="mb-1 block text-sm font-medium">邮箱</label>
               <input
                 id="email"
                 type="email"
-                required
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => handleChange('email', e.target.value)}
+                onBlur={(e) => handleBlur('email', e.target.value)}
+                className={`w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.email ? 'border-destructive' : 'border-input'}`}
               />
+              {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
             </div>
             <div>
               <label htmlFor="phone" className="mb-1 block text-sm font-medium">手机号</label>
@@ -73,9 +111,11 @@ export default function Register() {
                 id="phone"
                 type="tel"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => handleChange('phone', e.target.value)}
+                onBlur={(e) => handleBlur('phone', e.target.value)}
+                className={`w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.phone ? 'border-destructive' : 'border-input'}`}
               />
+              {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}
             </div>
             <div>
               <label htmlFor="password" className="mb-1 block text-sm font-medium">密码</label>
@@ -83,10 +123,10 @@ export default function Register() {
                 <input
                   id="password"
                   type={showPwd ? 'text' : 'password'}
-                  required
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full rounded-md border border-input px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-primary"
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={(e) => handleBlur('password', e.target.value)}
+                  className={`w-full rounded-md border px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.password ? 'border-destructive' : 'border-input'}`}
                 />
                 <button
                   type="button"
@@ -97,17 +137,19 @@ export default function Register() {
                   {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
             </div>
             <div>
               <label htmlFor="confirmPassword" className="mb-1 block text-sm font-medium">确认密码</label>
               <input
                 id="confirmPassword"
                 type="password"
-                required
                 value={form.confirmPassword}
-                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
+                className={`w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.confirmPassword ? 'border-destructive' : 'border-input'}`}
               />
+              {errors.confirmPassword && <p className="mt-1 text-xs text-destructive">{errors.confirmPassword}</p>}
             </div>
             <button
               type="submit"

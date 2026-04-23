@@ -52,7 +52,40 @@ describe('Register Page', () => {
     expect(screen.getByRole('link', { name: '去登录' })).toBeInTheDocument();
   });
 
-  it('shows error when passwords do not match', async () => {
+  it('shows real-time validation error on blur for invalid email', async () => {
+    render(<RegisterPage />);
+    const emailInput = screen.getByLabelText('邮箱');
+    fireEvent.change(emailInput, { target: { value: 'bad-email' } });
+    fireEvent.blur(emailInput);
+
+    await waitFor(() => {
+      expect(screen.getByText('请输入有效的邮箱地址')).toBeInTheDocument();
+    });
+  });
+
+  it('shows real-time validation error on blur for short username', async () => {
+    render(<RegisterPage />);
+    const usernameInput = screen.getByLabelText('用户名');
+    fireEvent.change(usernameInput, { target: { value: 'a' } });
+    fireEvent.blur(usernameInput);
+
+    await waitFor(() => {
+      expect(screen.getByText('用户名至少需要2个字符')).toBeInTheDocument();
+    });
+  });
+
+  it('shows real-time validation error on blur for short password', async () => {
+    render(<RegisterPage />);
+    const pwdInput = screen.getByLabelText('密码');
+    fireEvent.change(pwdInput, { target: { value: '123' } });
+    fireEvent.blur(pwdInput);
+
+    await waitFor(() => {
+      expect(screen.getByText('密码至少需要6个字符')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error when passwords do not match on submit', async () => {
     render(<RegisterPage />);
     fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'newuser' } });
     fireEvent.change(screen.getByLabelText('邮箱'), { target: { value: 'new@example.com' } });
@@ -62,6 +95,15 @@ describe('Register Page', () => {
 
     await waitFor(() => {
       expect(screen.getByText('两次输入的密码不一致')).toBeInTheDocument();
+    });
+  });
+
+  it('shows submit error when required fields are empty', async () => {
+    render(<RegisterPage />);
+    fireEvent.click(screen.getByRole('button', { name: '注册' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('请修正表单中的错误')).toBeInTheDocument();
     });
   });
 

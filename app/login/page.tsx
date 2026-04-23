@@ -9,6 +9,7 @@ import { useStore } from '@/hooks/useStore';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Eye, EyeOff } from 'lucide-react';
+import { validateField } from '@/lib/validation';
 
 export default function Login() {
   const router = useRouter();
@@ -17,10 +18,41 @@ export default function Login() {
   const [form, setForm] = useState({ username: '', password: '', role: 'user' as 'user' | 'counselor' | 'admin' });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const validationRules = {
+    username: (value: string) => (value.trim() ? '' : '请输入用户名'),
+    password: (value: string) => (value.length >= 6 ? '' : '密码至少需要6个字符'),
+  };
+
+  const validate = (name: string, value: string) => {
+    const error = validateField(name, value, validationRules);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    return error;
+  };
+
+  const handleChange = (name: string, value: string) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (touched[name]) validate(name, value);
+  };
+
+  const handleBlur = (name: string, value: string) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validate(name, value);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    const allErrors: Record<string, string> = {};
+    Object.keys(validationRules).forEach((key) => {
+      const err = validateField(key, form[key as keyof typeof form], validationRules);
+      if (err) allErrors[key] = err;
+    });
+    setErrors(allErrors);
+    setTouched({ username: true, password: true });
+    if (Object.keys(allErrors).length > 0) return;
 
     // 模拟登录：admin/123456, zhangsan/123456
     if (form.role === 'admin' && form.username === 'admin' && form.password === '123456') {
@@ -71,12 +103,13 @@ export default function Login() {
               <input
                 id="username"
                 type="text"
-                required
                 placeholder={form.role === 'admin' ? 'admin' : 'zhangsan'}
                 value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                onChange={(e) => handleChange('username', e.target.value)}
+                onBlur={(e) => handleBlur('username', e.target.value)}
+                className={`w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.username ? 'border-destructive' : 'border-input'}`}
               />
+              {errors.username && <p className="mt-1 text-xs text-destructive">{errors.username}</p>}
             </div>
             <div>
               <label htmlFor="password" className="mb-1 block text-sm font-medium">密码</label>
@@ -84,11 +117,11 @@ export default function Login() {
                 <input
                   id="password"
                   type={showPwd ? 'text' : 'password'}
-                  required
                   placeholder="123456"
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full rounded-md border border-input px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-primary"
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={(e) => handleBlur('password', e.target.value)}
+                  className={`w-full rounded-md border px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.password ? 'border-destructive' : 'border-input'}`}
                 />
                 <button
                   type="button"
@@ -99,6 +132,7 @@ export default function Login() {
                   {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
             </div>
             <button
               type="submit"
