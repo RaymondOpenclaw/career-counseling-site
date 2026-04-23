@@ -9,6 +9,8 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { User, Mail, Phone, Calendar, Lock, Save, ClipboardList, Clock, ArrowRight } from 'lucide-react';
 import Toast from '@/components/Toast';
+import ConfirmModal from '@/components/ConfirmModal';
+import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -21,6 +23,31 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<'info' | 'password' | 'appointments'>('info');
   const [appointments] = useStore('career_appointments', mockAppointments);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '未保存的更改',
+    message: '您有未保存的更改，确定要离开吗？',
+    onConfirm: () => {},
+  });
+  const [pendingTab, setPendingTab] = useState<'info' | 'password' | 'appointments' | null>(null);
+
+  const isInfoDirty =
+    form.username !== (user?.username || '') ||
+    form.email !== (user?.email || '') ||
+    form.phone !== (user?.phone || '');
+  const isPwdDirty = pwdForm.old !== '' || pwdForm.new !== '' || pwdForm.confirm !== '';
+  const isDirty = (activeTab === 'info' && isInfoDirty) || (activeTab === 'password' && isPwdDirty);
+
+  useUnsavedChanges(isDirty);
+
+  const handleTabChange = (tab: 'info' | 'password' | 'appointments') => {
+    if (isDirty && tab !== activeTab) {
+      setPendingTab(tab);
+      setConfirmModal((prev) => ({ ...prev, isOpen: true }));
+      return;
+    }
+    setActiveTab(tab);
+  };
 
   const statusMap: Record<string, string> = {
     pending: '待确认',
@@ -60,19 +87,19 @@ export default function Profile() {
 
           <div className="mb-6 flex gap-2">
             <button
-              onClick={() => setActiveTab('info')}
+              onClick={() => handleTabChange('info')}
               className={`rounded-md px-4 py-2 text-sm font-medium ${activeTab === 'info' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-accent'}`}
             >
               基本信息
             </button>
             <button
-              onClick={() => setActiveTab('password')}
+              onClick={() => handleTabChange('password')}
               className={`rounded-md px-4 py-2 text-sm font-medium ${activeTab === 'password' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-accent'}`}
             >
               修改密码
             </button>
             <button
-              onClick={() => setActiveTab('appointments')}
+              onClick={() => handleTabChange('appointments')}
               className={`rounded-md px-4 py-2 text-sm font-medium ${activeTab === 'appointments' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-accent'}`}
             >
               我的预约
@@ -233,6 +260,23 @@ export default function Profile() {
           onClose={() => setToast(null)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+          if (pendingTab) {
+            setActiveTab(pendingTab);
+            setPendingTab(null);
+          }
+        }}
+        onCancel={() => {
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+          setPendingTab(null);
+        }}
+      />
     </div>
   );
 }

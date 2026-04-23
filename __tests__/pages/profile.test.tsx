@@ -1,9 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfilePage from '@/app/profile/page';
 import { useAuth } from '@/hooks/useAuth';
 import { appointments as mockAppointments } from '@/data/mock';
 
 jest.mock('@/hooks/useAuth');
+jest.mock('@/hooks/useUnsavedChanges', () => ({
+  useUnsavedChanges: jest.fn(),
+}));
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
@@ -184,5 +187,82 @@ describe('Profile Page', () => {
     render(<ProfilePage />);
     fireEvent.click(screen.getByRole('button', { name: '我的预约' }));
     expect(screen.getByText('暂无预约记录')).toBeInTheDocument();
+  });
+
+  it('shows confirm modal when switching tabs with unsaved info changes', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: false,
+      isUser: true,
+      isLoggedIn: true,
+    });
+
+    render(<ProfilePage />);
+    fireEvent.change(screen.getByDisplayValue('张三'), { target: { value: '李四' } });
+    fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('未保存的更改')).toBeInTheDocument();
+      expect(screen.getByText('您有未保存的更改，确定要离开吗？')).toBeInTheDocument();
+    });
+  });
+
+  it('allows tab switch after confirming unsaved changes', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: false,
+      isUser: true,
+      isLoggedIn: true,
+    });
+
+    render(<ProfilePage />);
+    fireEvent.change(screen.getByDisplayValue('张三'), { target: { value: '李四' } });
+    fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('未保存的更改')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '确认', exact: true }));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('原密码')).toBeInTheDocument();
+    });
+  });
+
+  it('stays on current tab when cancelling unsaved changes warning', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: false,
+      isUser: true,
+      isLoggedIn: true,
+    });
+
+    render(<ProfilePage />);
+    fireEvent.change(screen.getByDisplayValue('张三'), { target: { value: '李四' } });
+    fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('未保存的更改')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '取消', exact: true }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('未保存的更改')).not.toBeInTheDocument();
+      expect(screen.getByDisplayValue('李四')).toBeInTheDocument();
+    });
   });
 });
