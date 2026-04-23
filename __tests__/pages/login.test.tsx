@@ -30,12 +30,16 @@ describe('Login Page', () => {
       isLoggedIn: false,
     });
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
+    localStorage.clear();
+    localStorage.setItem('career_users', JSON.stringify([
+      { id: 'u1', username: '张三', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+      { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+    ]));
   });
 
-  it('renders login form with all fields', () => {
+  it('renders login form with username and password', () => {
     render(<LoginPage />);
     expect(screen.getByRole('heading', { name: /欢迎回来/ })).toBeInTheDocument();
-    expect(screen.getByLabelText('角色')).toBeInTheDocument();
     expect(screen.getByLabelText('用户名')).toBeInTheDocument();
     expect(screen.getByLabelText('密码')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument();
@@ -59,26 +63,36 @@ describe('Login Page', () => {
 
   it('logs in as admin with correct credentials', async () => {
     render(<LoginPage />);
-    fireEvent.change(screen.getByLabelText('角色'), { target: { value: 'admin' } });
-    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'admin' } });
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: '管理员' } });
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));
 
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalled();
+      expect(mockLogin).toHaveBeenCalledWith('a1');
       expect(mockPush).toHaveBeenCalledWith('/admin');
     });
   });
 
-  it('logs in as user with correct credentials', async () => {
+  it('logs in as user with correct credentials via username', async () => {
     render(<LoginPage />);
-    fireEvent.change(screen.getByLabelText('角色'), { target: { value: 'user' } });
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: '张三' } });
+    fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: '登录' }));
+
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith('u1');
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
+  });
+
+  it('logs in as user with zhangsan alias', async () => {
+    render(<LoginPage />);
     fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'zhangsan' } });
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));
 
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalled();
+      expect(mockLogin).toHaveBeenCalledWith('u1');
       expect(mockPush).toHaveBeenCalledWith('/');
     });
   });

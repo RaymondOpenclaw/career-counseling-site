@@ -30,6 +30,7 @@ describe('Register Page', () => {
       isLoggedIn: false,
     });
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
+    localStorage.clear();
     jest.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
@@ -107,7 +108,7 @@ describe('Register Page', () => {
     });
   });
 
-  it('registers successfully with matching passwords', async () => {
+  it('registers successfully with matching passwords and stores passwordHash', async () => {
     render(<RegisterPage />);
     fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'newuser' } });
     fireEvent.change(screen.getByLabelText('邮箱'), { target: { value: 'new@example.com' } });
@@ -119,5 +120,14 @@ describe('Register Page', () => {
       expect(mockLogin).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith('/');
     });
+
+    // Verify passwordHash is stored in localStorage
+    const raw = localStorage.getItem('career_users');
+    expect(raw).not.toBeNull();
+    const users = JSON.parse(raw!);
+    const newUser = users.find((u: any) => u.username === 'newuser');
+    expect(newUser).toBeDefined();
+    expect(newUser.passwordHash).toBeDefined();
+    expect(newUser.passwordHash.startsWith('$2')).toBe(true);
   });
 });

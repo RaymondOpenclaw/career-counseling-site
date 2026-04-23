@@ -10,6 +10,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Eye, EyeOff } from 'lucide-react';
 import { validators, validateField } from '@/lib/validation';
+import bcrypt from 'bcryptjs';
 
 export default function Register() {
   const router = useRouter();
@@ -62,9 +63,17 @@ export default function Register() {
       setSubmitError('请修正表单中的错误');
       return;
     }
-    const newUser = { id: 'u' + Date.now(), username: form.username, email: form.email, role: 'user' as const, createdAt: new Date().toISOString().split('T')[0], phone: form.phone };
+    const newUser = {
+      id: 'u' + Date.now(),
+      username: form.username,
+      email: form.email,
+      role: 'user' as const,
+      createdAt: new Date().toISOString().split('T')[0],
+      phone: form.phone,
+      passwordHash: bcrypt.hashSync(form.password, 10),
+    };
     setUsers((prev) => [...prev, newUser]);
-    login(newUser);
+    login(newUser.id);
     router.push('/');
   };
 

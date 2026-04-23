@@ -11,6 +11,7 @@ import { User, Mail, Phone, Calendar, Lock, Save, ClipboardList, Clock, ArrowRig
 import Toast from '@/components/Toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import EmptyState from '@/components/EmptyState';
+import DataBackup from '@/components/DataBackup';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 
 export default function Profile() {
@@ -262,6 +263,9 @@ export default function Profile() {
               </Link>
             </div>
           )}
+          <div className="mt-6">
+            <DataBackup />
+          </div>
         </div>
       </main>
       <Footer />

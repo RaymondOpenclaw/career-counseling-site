@@ -10,12 +10,13 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Eye, EyeOff } from 'lucide-react';
 import { validateField } from '@/lib/validation';
+import bcrypt from 'bcryptjs';
 
 export default function Login() {
   const router = useRouter();
   const { login } = useAuth();
   const [users] = useStore('career_users', mockUsers);
-  const [form, setForm] = useState({ username: '', password: '', role: 'user' as 'user' | 'counselor' | 'admin' });
+  const [form, setForm] = useState({ username: '', password: '' });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,21 +55,20 @@ export default function Login() {
     setTouched({ username: true, password: true });
     if (Object.keys(allErrors).length > 0) return;
 
-    // 模拟登录：admin/123456, zhangsan/123456
-    if (form.role === 'admin' && form.username === 'admin' && form.password === '123456') {
-      login(users.find(u => u.role === 'admin') || { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' });
-      router.push('/admin');
+    const normalizedUsername = form.username === 'zhangsan' ? '张三' : form.username;
+    const found = users.find(
+      (u) => u.username === normalizedUsername || u.email === normalizedUsername
+    );
+
+    if (found?.passwordHash && bcrypt.compareSync(form.password, found.passwordHash)) {
+      login(found.id);
+      if (found.role === 'admin') router.push('/admin');
+      else if (found.role === 'counselor') router.push('/counselor');
+      else router.push('/');
       return;
     }
-    if (form.username === 'zhangsan' && form.password === '123456') {
-      const user = users.find(u => u.username === '张三');
-      if (user) {
-        login({ ...user, role: form.role === 'counselor' ? 'counselor' : 'user' });
-        router.push(form.role === 'counselor' ? '/counselor' : '/');
-      }
-      return;
-    }
-    setError('用户名或密码错误（演示账号：admin/123456 或 zhangsan/123456）');
+
+    setError('用户名或密码错误（演示账号：张三/123456 或 管理员/123456）');
   };
 
   return (
@@ -85,25 +85,11 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="role" className="mb-1 block text-sm font-medium">角色</label>
-              <select
-                id="role"
-                name="role"
-                value={form.role}
-                onChange={(e) => setForm({ ...form, role: e.target.value as any })}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="user">用户</option>
-                <option value="counselor">咨询师</option>
-                <option value="admin">管理员</option>
-              </select>
-            </div>
-            <div>
               <label htmlFor="username" className="mb-1 block text-sm font-medium">用户名</label>
               <input
                 id="username"
                 type="text"
-                placeholder={form.role === 'admin' ? 'admin' : 'zhangsan'}
+                placeholder="张三 或 zhangsan@example.com"
                 value={form.username}
                 onChange={(e) => handleChange('username', e.target.value)}
                 onBlur={(e) => handleBlur('username', e.target.value)}

@@ -1,9 +1,9 @@
 import { User, Counselor, Article, Announcement, Banner, Test, TestResult, Appointment, Message } from '@/types';
 
 export const users: User[] = [
-  { id: 'u1', username: '张三', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001' },
-  { id: 'u2', username: '李四', email: 'lisi@example.com', role: 'user', createdAt: '2024-02-10', phone: '13800138002' },
-  { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
+  { id: 'u1', username: '张三', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'u2', username: '李四', email: 'lisi@example.com', role: 'user', createdAt: '2024-02-10', phone: '13800138002', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
 ];
 
 export const counselors: Counselor[] = [

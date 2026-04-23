@@ -6,6 +6,7 @@ export interface User {
   phone?: string;
   role: 'user' | 'counselor' | 'admin';
   createdAt: string;
+  passwordHash?: string;
 }
 
 export interface Counselor {

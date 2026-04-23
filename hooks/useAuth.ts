@@ -2,33 +2,34 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { User } from '@/types';
+import { users as mockUsers } from '@/data/mock';
+import { useStore } from '@/hooks/useStore';
 
-const STORAGE_KEY = 'career_auth';
+const STORAGE_KEY = 'career_auth_id';
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
+  const [authId, setAuthId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [users] = useStore('career_users', mockUsers);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
-      }
+      setAuthId(stored);
     }
     setLoading(false);
   }, []);
 
-  const login = useCallback((userData: User) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-    setUser(userData);
+  const user: User | null = authId ? users.find((u) => u.id === authId) || null : null;
+
+  const login = useCallback((userId: string) => {
+    localStorage.setItem(STORAGE_KEY, userId);
+    setAuthId(userId);
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
-    setUser(null);
+    setAuthId(null);
   }, []);
 
   const isAdmin = user?.role === 'admin';
