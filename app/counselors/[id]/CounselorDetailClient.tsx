@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Star, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 
 export default function CounselorDetailClient({ id }: { id: string }) {
   const router = useRouter();
@@ -95,54 +96,42 @@ export default function CounselorDetailClient({ id }: { id: string }) {
           </div>
 
           {showBooking && (
-            <div className="mt-6 rounded-xl border bg-white p-6">
-              <h2 className="mb-4 text-lg font-semibold">预约咨询</h2>
-              <form onSubmit={handleBooking} className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+            <div className="mt-6 space-y-4">
+              <AvailabilityCalendar
+                onSelect={(date, time) => setBookingForm((prev) => ({ ...prev, date, time }))}
+              />
+              <div className="rounded-xl border bg-white p-6">
+                <form onSubmit={handleBooking} className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium">已选择：</span>
+                    <span className="text-muted-foreground">
+                      {bookingForm.date && bookingForm.time
+                        ? `${bookingForm.date} ${bookingForm.time}`
+                        : '请在上方日历选择时间'}
+                    </span>
+                  </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium">日期</label>
-                    <input
-                      type="date"
-                      required
-                      value={bookingForm.date}
-                      onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
+                    <label className="mb-1 block text-sm font-medium">咨询备注</label>
+                    <textarea
+                      rows={3}
+                      placeholder="请简述你想咨询的问题..."
+                      value={bookingForm.note}
+                      onChange={(e) => setBookingForm({ ...bookingForm, note: e.target.value })}
                       className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium">时间</label>
-                    <select
-                      required
-                      value={bookingForm.time}
-                      onChange={(e) => setBookingForm({ ...bookingForm, time: e.target.value })}
-                      className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      disabled={!bookingForm.date || !bookingForm.time}
+                      className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                     >
-                      <option value="">请选择</option>
-                      <option value="09:00">09:00</option>
-                      <option value="10:00">10:00</option>
-                      <option value="14:00">14:00</option>
-                      <option value="15:00">15:00</option>
-                      <option value="16:00">16:00</option>
-                      <option value="19:00">19:00</option>
-                      <option value="20:00">20:00</option>
-                    </select>
+                      确认预约
+                    </button>
+                    <button type="button" onClick={() => setShowBooking(false)} className="rounded-md border px-6 py-2.5 text-sm font-medium hover:bg-accent">取消</button>
                   </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">咨询备注</label>
-                  <textarea
-                    rows={3}
-                    placeholder="请简述你想咨询的问题..."
-                    value={bookingForm.note}
-                    onChange={(e) => setBookingForm({ ...bookingForm, note: e.target.value })}
-                    className="w-full rounded-md border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <button type="submit" className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">确认预约</button>
-                  <button type="button" onClick={() => setShowBooking(false)} className="rounded-md border px-6 py-2.5 text-sm font-medium hover:bg-accent">取消</button>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
           )}
         </div>
