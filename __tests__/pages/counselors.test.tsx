@@ -48,4 +48,32 @@ describe('Counselors Page', () => {
     expect(screen.getByText('¥299/次')).toBeInTheDocument();
     expect(screen.getByText('¥399/次')).toBeInTheDocument();
   });
+
+  it('filters counselors by price range', () => {
+    render(<CounselorsPage />);
+    fireEvent.click(screen.getByRole('button', { name: '¥0-200' }));
+    expect(screen.queryByText('¥299/次')).not.toBeInTheDocument();
+    expect(screen.queryByText('¥399/次')).not.toBeInTheDocument();
+  });
+
+  it('filters counselors by rating', () => {
+    render(<CounselorsPage />);
+    fireEvent.click(screen.getByRole('button', { name: '4.5分以上' }));
+    expect(screen.getByText('王职业')).toBeInTheDocument();
+    expect(screen.getByText('李发展')).toBeInTheDocument();
+  });
+
+  it('filters counselors by experience', () => {
+    render(<CounselorsPage />);
+    fireEvent.click(screen.getByRole('button', { name: '10年+' }));
+    expect(screen.queryByText('¥299/次')).not.toBeInTheDocument();
+  });
+
+  it('combines multiple filters', () => {
+    render(<CounselorsPage />);
+    fireEvent.click(screen.getByRole('button', { name: '职业转型' }));
+    fireEvent.click(screen.getByRole('button', { name: '4.0分以上' }));
+    expect(screen.getByText('王职业')).toBeInTheDocument();
+    expect(screen.queryByText('李发展')).not.toBeInTheDocument();
+  });
 });
