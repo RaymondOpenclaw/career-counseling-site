@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { appointments as mockAppointments, users as mockUsers, counselors as mockCounselors } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import { Search, Trash2, Calendar, Clock, User, CheckCircle, Plus, Pencil, XCircle, CheckCircle2 } from 'lucide-react';
+import { Search, Trash2, Calendar, Clock, User, CheckCircle, Plus, Pencil, XCircle, CheckCircle2, ArrowUpDown } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
+import Pagination from '@/components/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export default function AdminAppointmentsPage() {
   const [appointments, setAppointments] = useStore('career_appointments', mockAppointments);
@@ -46,9 +48,30 @@ export default function AdminAppointmentsPage() {
     cancelled: 'bg-gray-100 text-gray-700',
   };
 
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
   const filtered = appointments.filter(
     (a) => a.userName.includes(search) || a.counselorName.includes(search)
   );
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (!sortKey) return 0;
+    const av = String(a[sortKey as keyof typeof a] || '');
+    const bv = String(b[sortKey as keyof typeof b] || '');
+    return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+
+  const { page, setPage, totalPages, paginatedData } = usePagination({ data: sorted, pageSize: 5 });
 
   const openCreate = () => {
     setForm({
@@ -154,16 +177,28 @@ export default function AdminAppointmentsPage() {
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
-              <th className="px-4 py-3 text-left font-medium">用户</th>
-              <th className="px-4 py-3 text-left font-medium">咨询师</th>
-              <th className="px-4 py-3 text-left font-medium">日期</th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button type="button" onClick={() => handleSort('userName')} className="flex items-center gap-1">
+                  用户 <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button type="button" onClick={() => handleSort('counselorName')} className="flex items-center gap-1">
+                  咨询师 <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button type="button" onClick={() => handleSort('date')} className="flex items-center gap-1">
+                  日期 <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
               <th className="px-4 py-3 text-left font-medium">时间</th>
               <th className="px-4 py-3 text-left font-medium">状态</th>
               <th className="px-4 py-3 text-right font-medium">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.map((a) => (
+            {paginatedData.map((a) => (
               <tr key={a.id} className="hover:bg-muted/30">
                 <td className="px-4 py-3">{a.userName}</td>
                 <td className="px-4 py-3">{a.counselorName}</td>
@@ -223,6 +258,7 @@ export default function AdminAppointmentsPage() {
             ))}
           </tbody>
         </table>
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} onChange={setPage} />
       </div>
 
       {showModal && (

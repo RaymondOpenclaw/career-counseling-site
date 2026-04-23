@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { users as mockUsers } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import { Search, Trash2, User, Plus, Pencil } from 'lucide-react';
+import { Search, Trash2, User, Plus, Pencil, ArrowUpDown } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal';
+import Pagination from '@/components/Pagination';
+import { usePagination } from '@/hooks/usePagination';
 
 export default function UsersPage() {
   const [users, setUsers] = useStore('career_users', mockUsers);
@@ -24,7 +26,28 @@ export default function UsersPage() {
     onConfirm: () => {},
   });
 
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
   const filtered = users.filter((u) => u.username.includes(search) || u.email.includes(search));
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (!sortKey) return 0;
+    const av = String(a[sortKey as keyof typeof a] || '');
+    const bv = String(b[sortKey as keyof typeof b] || '');
+    return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+
+  const { page, setPage, totalPages, paginatedData } = usePagination({ data: sorted, pageSize: 5 });
 
   const openCreate = () => {
     setForm({ username: '', email: '', phone: '', role: 'user' });
@@ -96,16 +119,28 @@ export default function UsersPage() {
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
-              <th className="px-4 py-3 text-left font-medium">用户</th>
-              <th className="px-4 py-3 text-left font-medium">邮箱</th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button type="button" onClick={() => handleSort('username')} className="flex items-center gap-1">
+                  用户 <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button type="button" onClick={() => handleSort('email')} className="flex items-center gap-1">
+                  邮箱 <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
               <th className="px-4 py-3 text-left font-medium">手机号</th>
               <th className="px-4 py-3 text-left font-medium">角色</th>
-              <th className="px-4 py-3 text-left font-medium">注册时间</th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button type="button" onClick={() => handleSort('createdAt')} className="flex items-center gap-1">
+                  注册时间 <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
               <th className="px-4 py-3 text-right font-medium">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.map((u) => (
+            {paginatedData.map((u) => (
               <tr key={u.id} className="hover:bg-muted/30">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
@@ -143,6 +178,7 @@ export default function UsersPage() {
             ))}
           </tbody>
         </table>
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} onChange={setPage} />
       </div>
 
       {showModal && (
