@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { User, Mail, Phone, Calendar, Lock, Save, ClipboardList, Clock, ArrowRight } from 'lucide-react';
+import Toast from '@/components/Toast';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -19,6 +20,7 @@ export default function Profile() {
   const [pwdForm, setPwdForm] = useState({ old: '', new: '', confirm: '' });
   const [activeTab, setActiveTab] = useState<'info' | 'password' | 'appointments'>('info');
   const [appointments] = useStore('career_appointments', mockAppointments);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const statusMap: Record<string, string> = {
     pending: '待确认',
@@ -36,16 +38,16 @@ export default function Profile() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('保存成功（演示模式）');
+    setToast({ message: '保存成功（演示模式）', type: 'success' });
   };
 
   const handleChangePwd = (e: React.FormEvent) => {
     e.preventDefault();
     if (pwdForm.new !== pwdForm.confirm) {
-      alert('两次输入的新密码不一致');
+      setToast({ message: '两次输入的新密码不一致', type: 'error' });
       return;
     }
-    alert('密码修改成功（演示模式）');
+    setToast({ message: '密码修改成功（演示模式）', type: 'success' });
     setPwdForm({ old: '', new: '', confirm: '' });
   };
 
@@ -224,6 +226,13 @@ export default function Profile() {
         </div>
       </main>
       <Footer />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

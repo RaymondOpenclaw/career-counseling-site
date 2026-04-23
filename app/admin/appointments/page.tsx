@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { appointments as mockAppointments, users as mockUsers, counselors as mockCounselors } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { Search, Trash2, Calendar, Clock, User, CheckCircle, Plus, Pencil, XCircle, CheckCircle2 } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
+import Toast from '@/components/Toast';
 
 export default function AdminAppointmentsPage() {
   const [appointments, setAppointments] = useStore('career_appointments', mockAppointments);
@@ -22,6 +24,13 @@ export default function AdminAppointmentsPage() {
     status: 'pending' as 'pending' | 'confirmed' | 'completed' | 'cancelled',
     note: '',
   });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const statusMap: Record<string, string> = {
     pending: '待确认',
@@ -86,18 +95,26 @@ export default function AdminAppointmentsPage() {
       setAppointments((prev) => [newAppointment, ...prev]);
     }
     setShowModal(false);
+    setToast({ message: editingId ? '预约已更新' : '预约已创建', type: 'success' });
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该预约吗？')) {
-      setAppointments((prev) => prev.filter((a) => a.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除预约',
+      message: '确定删除该预约吗？',
+      onConfirm: () => {
+        setAppointments((prev) => prev.filter((a) => a.id !== id));
+        setToast({ message: '预约已删除', type: 'success' });
+      },
+    });
   };
 
   const handleStatusChange = (id: string, status: typeof form.status) => {
     setAppointments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status } : a))
     );
+    setToast({ message: '状态已更新', type: 'success' });
   };
 
   const handleUserChange = (userId: string) => {
@@ -307,6 +324,19 @@ export default function AdminAppointmentsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

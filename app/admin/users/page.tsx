@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { users as mockUsers } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { Search, Trash2, User, Plus, Pencil } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function UsersPage() {
   const [users, setUsers] = useStore('career_users', mockUsers);
@@ -15,6 +16,12 @@ export default function UsersPage() {
     email: '',
     phone: '',
     role: 'user' as 'user' | 'counselor' | 'admin',
+  });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
   });
 
   const filtered = users.filter((u) => u.username.includes(search) || u.email.includes(search));
@@ -52,9 +59,14 @@ export default function UsersPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该用户吗？')) {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除用户',
+      message: '确定删除该用户吗？',
+      onConfirm: () => {
+        setUsers((prev) => prev.filter((u) => u.id !== id));
+      },
+    });
   };
 
   return (
@@ -198,6 +210,17 @@ export default function UsersPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

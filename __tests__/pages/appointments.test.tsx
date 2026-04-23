@@ -4,7 +4,6 @@ import { appointments as mockAppointments } from '@/data/mock';
 
 describe('Appointments Page', () => {
   beforeEach(() => {
-    jest.spyOn(window, 'confirm').mockReturnValue(true);
     localStorage.setItem('career_appointments', JSON.stringify(mockAppointments));
   });
 
@@ -45,7 +44,9 @@ describe('Appointments Page', () => {
     const cancelButtons = screen.getAllByText('取消预约');
     expect(cancelButtons.length).toBeGreaterThan(0);
     fireEvent.click(cancelButtons[0]);
-    expect(window.confirm).toHaveBeenCalledWith('确定取消此预约吗？');
+    expect(screen.getByText('确定取消此预约吗？')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '确认', exact: true }));
+    expect(screen.getByText('预约已取消')).toBeInTheDocument();
   });
 
   it('shows appointment detail when clicking detail button', () => {
@@ -87,7 +88,7 @@ describe('Appointments Page', () => {
     render(<AppointmentsPage />);
     fireEvent.click(screen.getAllByRole('button', { name: /修改/ })[0]);
     expect(screen.getByRole('heading', { name: '修改预约' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '取消' }));
+    fireEvent.click(screen.getByRole('button', { name: '取消', exact: true }));
     expect(screen.queryByRole('heading', { name: '修改预约' })).not.toBeInTheDocument();
   });
 
@@ -98,7 +99,9 @@ describe('Appointments Page', () => {
     fireEvent.change(screen.getByLabelText('时间'), { target: { value: '10:00' } });
     fireEvent.change(screen.getByLabelText('咨询备注'), { target: { value: '更新备注' } });
     fireEvent.click(screen.getByRole('button', { name: '保存修改' }));
-    expect(window.confirm).toHaveBeenCalledWith('确定保存修改吗？');
+    expect(screen.getByText('确定保存修改吗？')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '确认', exact: true }));
+    expect(screen.getByText('修改已保存')).toBeInTheDocument();
     expect(screen.getAllByText('2024-12-01').length).toBeGreaterThan(0);
     expect(screen.getAllByText('10:00').length).toBeGreaterThanOrEqual(2);
     expect(screen.queryAllByText('备注：更新备注').length).toBeGreaterThan(0);
@@ -110,7 +113,9 @@ describe('Appointments Page', () => {
     const deleteButtons = screen.getAllByRole('button', { name: /删除/ });
     expect(deleteButtons.length).toBeGreaterThan(0);
     fireEvent.click(deleteButtons[0]);
-    expect(window.confirm).toHaveBeenCalledWith('确定删除此预约吗？删除后不可恢复。');
+    expect(screen.getByText('确定删除此预约吗？删除后不可恢复。')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '确认', exact: true }));
+    expect(screen.getByText('预约已删除')).toBeInTheDocument();
     expect(screen.queryByText(/王职业/)).not.toBeInTheDocument();
   });
 
@@ -119,7 +124,8 @@ describe('Appointments Page', () => {
     expect(screen.getAllByText('已确认').length).toBeGreaterThan(0);
     const cancelButtons = screen.getAllByText('取消预约');
     fireEvent.click(cancelButtons[0]);
-    expect(window.confirm).toHaveBeenCalledWith('确定取消此预约吗？');
+    fireEvent.click(screen.getByRole('button', { name: '确认', exact: true }));
+    expect(screen.getByText('预约已取消')).toBeInTheDocument();
     expect(screen.getAllByText('已取消').length).toBeGreaterThan(0);
   });
 });

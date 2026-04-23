@@ -9,7 +9,6 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
 describe('Profile Page', () => {
   beforeEach(() => {
-    jest.spyOn(window, 'alert').mockImplementation(() => {});
     localStorage.setItem('career_appointments', JSON.stringify(mockAppointments));
   });
 
@@ -73,7 +72,7 @@ describe('Profile Page', () => {
     expect(screen.getByLabelText('确认新密码')).toBeInTheDocument();
   });
 
-  it('shows alert on save info', () => {
+  it('shows toast on save info', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
@@ -87,10 +86,10 @@ describe('Profile Page', () => {
 
     render(<ProfilePage />);
     fireEvent.click(screen.getByRole('button', { name: /保存修改/ }));
-    expect(window.alert).toHaveBeenCalledWith('保存成功（演示模式）');
+    expect(screen.getByText('保存成功（演示模式）')).toBeInTheDocument();
   });
 
-  it('shows alert when passwords do not match', () => {
+  it('shows toast when passwords do not match', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
@@ -109,7 +108,29 @@ describe('Profile Page', () => {
     fireEvent.change(screen.getByLabelText('确认新密码'), { target: { value: 'newpwd2' } });
     fireEvent.click(screen.getAllByRole('button', { name: /修改密码/ })[1]);
 
-    expect(window.alert).toHaveBeenCalledWith('两次输入的新密码不一致');
+    expect(screen.getByText('两次输入的新密码不一致')).toBeInTheDocument();
+  });
+
+  it('shows toast on password change success', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: false,
+      isUser: true,
+      isLoggedIn: true,
+    });
+
+    render(<ProfilePage />);
+    fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
+    fireEvent.change(screen.getByLabelText('原密码'), { target: { value: 'oldpwd' } });
+    fireEvent.change(screen.getByLabelText('新密码'), { target: { value: 'newpwd' } });
+    fireEvent.change(screen.getByLabelText('确认新密码'), { target: { value: 'newpwd' } });
+    fireEvent.click(screen.getAllByRole('button', { name: /修改密码/ })[1]);
+
+    expect(screen.getByText('密码修改成功（演示模式）')).toBeInTheDocument();
   });
 
   it('renders appointments tab button', () => {

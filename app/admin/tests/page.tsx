@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { tests as mockTests } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { TestTube, Clock, Plus, Pencil, Trash2, X } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 import type { Question, Option } from '@/types';
 
 function generateId(prefix: string) {
@@ -19,6 +20,12 @@ export default function AdminTestsPage() {
     description: '',
     category: '',
     questions: [] as Question[],
+  });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
   });
 
   const openCreate = () => {
@@ -69,9 +76,14 @@ export default function AdminTestsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该测评吗？')) {
-      setTests((prev) => prev.filter((t) => t.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除测评',
+      message: '确定删除该测评吗？',
+      onConfirm: () => {
+        setTests((prev) => prev.filter((t) => t.id !== id));
+      },
+    });
   };
 
   const addQuestion = () => {
@@ -316,6 +328,17 @@ export default function AdminTestsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

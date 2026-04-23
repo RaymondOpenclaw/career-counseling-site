@@ -4,11 +4,18 @@ import { useState } from 'react';
 import { announcements as mockAnnouncements } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { Trash2, Plus } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function AdminAnnouncementsPage() {
   const [announcements, setAnnouncements] = useStore('career_announcements', mockAnnouncements);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', content: '' });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,9 +31,14 @@ export default function AdminAnnouncementsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该公告吗？')) {
-      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除公告',
+      message: '确定删除该公告吗？',
+      onConfirm: () => {
+        setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+      },
+    });
   };
 
   return (
@@ -88,6 +100,17 @@ export default function AdminAnnouncementsPage() {
           </div>
         ))}
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

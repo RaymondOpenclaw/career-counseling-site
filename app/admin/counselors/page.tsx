@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { counselors as mockCounselors } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { Search, Trash2, Star, Plus, Pencil } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function AdminCounselorsPage() {
   const [counselors, setCounselors] = useStore('career_counselors', mockCounselors);
@@ -20,6 +21,12 @@ export default function AdminCounselorsPage() {
     consultCount: 0,
     price: 0,
     status: 'active' as 'active' | 'busy' | 'offline',
+  });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
   });
 
   const filtered = counselors.filter((c) => c.name.includes(search) || c.title.includes(search));
@@ -78,9 +85,14 @@ export default function AdminCounselorsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该咨询师吗？')) {
-      setCounselors((prev) => prev.filter((c) => c.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除咨询师',
+      message: '确定删除该咨询师吗？',
+      onConfirm: () => {
+        setCounselors((prev) => prev.filter((c) => c.id !== id));
+      },
+    });
   };
 
   return (
@@ -284,6 +296,17 @@ export default function AdminCounselorsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { articles as mockArticles } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { Search, Trash2, Eye, Heart, Plus, Pencil } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function AdminArticlesPage() {
   const [articles, setArticles] = useStore('career_articles', mockArticles);
@@ -18,6 +19,12 @@ export default function AdminArticlesPage() {
     author: '',
     authorId: '',
     cover: '',
+  });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
   });
 
   const filtered = articles.filter((a) => a.title.includes(search) || a.author.includes(search));
@@ -66,9 +73,14 @@ export default function AdminArticlesPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该文章吗？')) {
-      setArticles((prev) => prev.filter((a) => a.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除文章',
+      message: '确定删除该文章吗？',
+      onConfirm: () => {
+        setArticles((prev) => prev.filter((a) => a.id !== id));
+      },
+    });
   };
 
   return (
@@ -240,6 +252,17 @@ export default function AdminArticlesPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

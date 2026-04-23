@@ -4,11 +4,18 @@ import { useState } from 'react';
 import { banners as mockBanners } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { Trash2, Plus, Image } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useStore('career_banners', mockBanners);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', image: '', link: '' });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +32,14 @@ export default function AdminBannersPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除该轮播图吗？')) {
-      setBanners((prev) => prev.filter((b) => b.id !== id));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除轮播图',
+      message: '确定删除该轮播图吗？',
+      onConfirm: () => {
+        setBanners((prev) => prev.filter((b) => b.id !== id));
+      },
+    });
   };
 
   return (
@@ -102,6 +114,17 @@ export default function AdminBannersPage() {
           </div>
         ))}
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

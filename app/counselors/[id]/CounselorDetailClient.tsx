@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Star, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Toast from '@/components/Toast';
 
 export default function CounselorDetailClient({ id }: { id: string }) {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function CounselorDetailClient({ id }: { id: string }) {
   const counselor = counselors.find((c) => c.id === id);
   const [showBooking, setShowBooking] = useState(false);
   const [bookingForm, setBookingForm] = useState({ date: '', time: '', note: '' });
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   if (!counselor) {
     return (
@@ -28,7 +30,7 @@ export default function CounselorDetailClient({ id }: { id: string }) {
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('预约提交成功！（演示模式）');
+    setToast({ message: '预约提交成功！（演示模式）', type: 'success' });
     setShowBooking(false);
   };
 
@@ -139,6 +141,7 @@ export default function CounselorDetailClient({ id }: { id: string }) {
           )}
         </div>
       </main>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <Footer />
     </div>
   );

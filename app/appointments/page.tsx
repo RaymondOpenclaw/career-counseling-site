@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ConfirmModal from '@/components/ConfirmModal';
+import Toast from '@/components/Toast';
 import { Calendar, Clock, User, MessageSquare, Filter, Eye, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AppointmentsPage() {
@@ -13,6 +15,13 @@ export default function AppointmentsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ date: '', time: '', note: '' });
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const statusMap: Record<string, string> = {
     pending: '待确认',
@@ -35,16 +44,28 @@ export default function AppointmentsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('确定删除此预约吗？删除后不可恢复。')) {
-      setAppointments((prev) => prev.filter((a) => a.id !== id));
-      if (expandedId === id) setExpandedId(null);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '删除预约',
+      message: '确定删除此预约吗？删除后不可恢复。',
+      onConfirm: () => {
+        setAppointments((prev) => prev.filter((a) => a.id !== id));
+        if (expandedId === id) setExpandedId(null);
+        setToast({ message: '预约已删除', type: 'success' });
+      },
+    });
   };
 
   const handleCancel = (id: string) => {
-    if (confirm('确定取消此预约吗？')) {
-      setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' as const } : a)));
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '取消预约',
+      message: '确定取消此预约吗？',
+      onConfirm: () => {
+        setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' as const } : a)));
+        setToast({ message: '预约已取消', type: 'success' });
+      },
+    });
   };
 
   const handleEditOpen = (id: string) => {
@@ -57,17 +78,29 @@ export default function AppointmentsPage() {
   const handleEditSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingId) return;
-    if (confirm('确定保存修改吗？')) {
-      setAppointments((prev) =>
-        prev.map((a) =>
-          a.id === editingId
-            ? { ...a, date: editForm.date, time: editForm.time, note: editForm.note }
-            : a
-        )
-      );
-      setEditingId(null);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: '保存修改',
+      message: '确定保存修改吗？',
+      onConfirm: () => {
+        setAppointments((prev) =>
+          prev.map((a) =>
+            a.id === editingId
+              ? { ...a, date: editForm.date, time: editForm.time, note: editForm.note }
+              : a
+          )
+        );
+        setEditingId(null);
+        setToast({ message: '修改已保存', type: 'success' });
+      },
+    });
   };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -237,6 +270,19 @@ export default function AppointmentsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          confirmModal.onConfirm();
+          setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <Footer />
     </div>
