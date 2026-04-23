@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
+import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
-import { Calendar, Clock, User, MessageSquare, Filter, Eye, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import EmptyState from '@/components/EmptyState';
+import { Calendar, Clock, User, MessageSquare, Filter, Eye, Pencil, Trash2, ChevronDown, ChevronUp, CalendarPlus } from 'lucide-react';
 
 export default function AppointmentsPage() {
   const [filter, setFilter] = useState('全部');
@@ -206,7 +208,19 @@ export default function AppointmentsPage() {
           </div>
 
           {filtered.length === 0 && (
-            <div className="py-20 text-center text-muted-foreground">暂无预约记录</div>
+            <EmptyState
+              icon={<CalendarPlus className="mx-auto h-10 w-10" />}
+              title="暂无预约记录"
+              description="你还没有预约任何咨询师，现在去预约一位吧"
+              action={
+                <Link
+                  href="/counselors"
+                  className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  去预约咨询师
+                </Link>
+              }
+            />
           )}
         </div>
       </main>

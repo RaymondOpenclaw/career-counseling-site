@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import { Calendar, Clock, User, CheckCircle, XCircle } from 'lucide-react';
+import EmptyState from '@/components/EmptyState';
+import { Calendar, Clock, User, CheckCircle, XCircle, ClipboardList } from 'lucide-react';
 
 export default function CounselorPage() {
   const [appointments, setAppointments] = useStore('career_appointments', mockAppointments);
@@ -75,7 +76,11 @@ export default function CounselorPage() {
       </div>
 
       {appointments.length === 0 && (
-        <div className="py-20 text-center text-muted-foreground">暂无预约</div>
+        <EmptyState
+          icon={<ClipboardList className="mx-auto h-10 w-10" />}
+          title="暂无预约"
+          description="当前没有待处理的预约请求"
+        />
       )}
     </div>
   );

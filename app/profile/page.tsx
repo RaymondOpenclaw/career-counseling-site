@@ -7,9 +7,10 @@ import { appointments as mockAppointments } from '@/data/mock';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import { User, Mail, Phone, Calendar, Lock, Save, ClipboardList, Clock, ArrowRight } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Lock, Save, ClipboardList, Clock, ArrowRight, CalendarPlus } from 'lucide-react';
 import Toast from '@/components/Toast';
 import ConfirmModal from '@/components/ConfirmModal';
+import EmptyState from '@/components/EmptyState';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 
 export default function Profile() {
@@ -219,9 +220,20 @@ export default function Profile() {
           {activeTab === 'appointments' && (
             <div className="space-y-4">
               {appointments.length === 0 ? (
-                <div className="rounded-xl border bg-white p-6 text-center text-muted-foreground">
-                  <ClipboardList className="mx-auto mb-2 h-8 w-8" />
-                  暂无预约记录
+                <div className="rounded-xl border bg-white p-6">
+                  <EmptyState
+                    icon={<CalendarPlus className="mx-auto h-10 w-10" />}
+                    title="暂无预约记录"
+                    description="你还没有预约任何咨询师"
+                    action={
+                      <Link
+                        href="/counselors"
+                        className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                      >
+                        去预约咨询师
+                      </Link>
+                    }
+                  />
                 </div>
               ) : (
                 appointments.map((a) => (
