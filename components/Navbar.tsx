@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
 import { Menu, X, User, LogOut, LayoutDashboard, MessageSquare, ClipboardList } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
   const { user, logout, isLoggedIn, isAdmin, isCounselor } = useAuth();
@@ -47,6 +48,7 @@ export default function Navbar() {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
+              <NotificationBell />
               <Link
                 href="/appointments"
                 className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary"
