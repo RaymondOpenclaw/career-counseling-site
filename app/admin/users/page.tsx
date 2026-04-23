@@ -115,7 +115,7 @@ export default function UsersPage() {
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border bg-white">
+      <div className="hidden md:block overflow-x-auto rounded-xl border bg-white">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -178,6 +178,51 @@ export default function UsersPage() {
             ))}
           </tbody>
         </table>
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} onChange={setPage} />
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {paginatedData.map((u) => (
+          <div key={u.id} className="rounded-xl border bg-white p-4">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{u.username}</p>
+                <p className="text-xs text-muted-foreground">{u.email}</p>
+              </div>
+            </div>
+            <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span className="text-xs text-muted-foreground">手机号</span>
+                <p>{u.phone || '-'}</p>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground">角色</span>
+                <p><span className="rounded-full bg-secondary px-2 py-0.5 text-xs">{u.role}</span></p>
+              </div>
+              <div className="col-span-2">
+                <span className="text-xs text-muted-foreground">注册时间</span>
+                <p>{u.createdAt}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 border-t pt-3">
+              <button
+                onClick={() => openEdit(u)}
+                className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+              >
+                <Pencil className="h-3 w-3" /> 编辑
+              </button>
+              <button
+                onClick={() => handleDelete(u.id)}
+                className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3 w-3" /> 删除
+              </button>
+            </div>
+          </div>
+        ))}
         <Pagination page={page} totalPages={totalPages} total={sorted.length} onChange={setPage} />
       </div>
 

@@ -173,7 +173,7 @@ export default function AdminAppointmentsPage() {
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border bg-white">
+      <div className="hidden md:block overflow-x-auto rounded-xl border bg-white">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
             <tr>
@@ -258,6 +258,71 @@ export default function AdminAppointmentsPage() {
             ))}
           </tbody>
         </table>
+        <Pagination page={page} totalPages={totalPages} total={sorted.length} onChange={setPage} />
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {paginatedData.map((a) => (
+          <div key={a.id} className="rounded-xl border bg-white p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold">{a.userName}</p>
+                <p className="text-xs text-muted-foreground">{a.counselorName}</p>
+              </div>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[a.status]}`}>
+                {statusMap[a.status]}
+              </span>
+            </div>
+            <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span className="text-xs text-muted-foreground">日期</span>
+                <p>{a.date}</p>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground">时间</span>
+                <p>{a.time}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 border-t pt-3">
+              {a.status === 'pending' && (
+                <button
+                  onClick={() => handleStatusChange(a.id, 'confirmed')}
+                  className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+                >
+                  <CheckCircle2 className="h-3 w-3" /> 确认
+                </button>
+              )}
+              {a.status === 'confirmed' && (
+                <button
+                  onClick={() => handleStatusChange(a.id, 'completed')}
+                  className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+                >
+                  <CheckCircle className="h-3 w-3" /> 完成
+                </button>
+              )}
+              {(a.status === 'pending' || a.status === 'confirmed') && (
+                <button
+                  onClick={() => handleStatusChange(a.id, 'cancelled')}
+                  className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+                >
+                  <XCircle className="h-3 w-3" /> 取消
+                </button>
+              )}
+              <button
+                onClick={() => openEdit(a)}
+                className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-accent"
+              >
+                <Pencil className="h-3 w-3" /> 编辑
+              </button>
+              <button
+                onClick={() => handleDelete(a.id)}
+                className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3 w-3" /> 删除
+              </button>
+            </div>
+          </div>
+        ))}
         <Pagination page={page} totalPages={totalPages} total={sorted.length} onChange={setPage} />
       </div>
 
