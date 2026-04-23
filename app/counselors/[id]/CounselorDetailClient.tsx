@@ -2,8 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { counselors as mockCounselors } from '@/data/mock';
+import { counselors as mockCounselors, appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
+import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Star, Calendar, ArrowLeft } from 'lucide-react';
@@ -12,7 +13,9 @@ import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 
 export default function CounselorDetailClient({ id }: { id: string }) {
   const router = useRouter();
+  const { user } = useAuth();
   const [counselors] = useStore('career_counselors', mockCounselors);
+  const [, setAppointments] = useStore('career_appointments', mockAppointments);
   const counselor = counselors.find((c) => c.id === id);
   const [showBooking, setShowBooking] = useState(false);
   const [bookingForm, setBookingForm] = useState({ date: '', time: '', note: '' });
@@ -29,6 +32,19 @@ export default function CounselorDetailClient({ id }: { id: string }) {
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
+    const newAppointment = {
+      id: 'ap' + Date.now(),
+      userId: user?.id || '',
+      userName: user?.username || '',
+      counselorId: counselor.id,
+      counselorName: counselor.name,
+      date: bookingForm.date,
+      time: bookingForm.time,
+      status: 'pending' as const,
+      note: bookingForm.note,
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    setAppointments((prev) => [newAppointment, ...prev]);
     localStorage.setItem(
       'career_last_booking',
       JSON.stringify({
