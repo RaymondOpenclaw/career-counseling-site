@@ -31,6 +31,9 @@ describe('useAuth hook', () => {
   });
 
   it('should login a user and persist userId to localStorage', () => {
+    localStorage.setItem('career_users', JSON.stringify([
+      { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+    ]));
     const { result } = renderHook(() => useAuth());
 
     act(() => {
@@ -45,6 +48,9 @@ describe('useAuth hook', () => {
   });
 
   it('should logout and clear localStorage', () => {
+    localStorage.setItem('career_users', JSON.stringify([
+      { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+    ]));
     localStorage.setItem(STORAGE_KEY, 'u1');
 
     const { result } = renderHook(() => useAuth());

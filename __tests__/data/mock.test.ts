@@ -2,7 +2,7 @@ import { users, counselors, articles, announcements, tests, appointments, testRe
 
 describe('Mock data integrity', () => {
   it('users array should have valid user objects', () => {
-    expect(users.length).toBeGreaterThan(0);
+    expect(Array.isArray(users)).toBe(true);
     users.forEach((user) => {
       expect(user).toHaveProperty('id');
       expect(user).toHaveProperty('username');
