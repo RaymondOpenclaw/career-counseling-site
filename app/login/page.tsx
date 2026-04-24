@@ -65,9 +65,8 @@ export default function Login() {
       return;
     }
 
-    const normalizedUsername = form.username === 'zhangsan' ? '张三' : form.username;
     const found = users.find(
-      (u) => u.username === normalizedUsername || u.email === normalizedUsername
+      (u) => u.username === form.username || u.email === form.username
     );
 
     if (found?.passwordHash && bcrypt.compareSync(form.password, found.passwordHash)) {

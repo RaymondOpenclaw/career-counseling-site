@@ -47,9 +47,9 @@ describe('Login Page', () => {
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
     localStorage.clear();
     localStorage.setItem('career_users', JSON.stringify([
-      { id: 'u1', username: '张三', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-      { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-      { id: 'uc1', username: '王职业', email: 'wang@example.com', role: 'counselor', createdAt: '2024-01-05', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+      { id: 'u1', username: 'zhangsan', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+      { id: 'a1', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+      { id: 'uc1', username: 'wangzhiye', email: 'wang@example.com', role: 'counselor', createdAt: '2024-01-05', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
     ]));
   });
 
@@ -81,7 +81,7 @@ describe('Login Page', () => {
 
   it('shows error for wrong captcha', async () => {
     render(<LoginPage />);
-    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: '张三' } });
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'zhangsan' } });
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
     fireEvent.change(screen.getByLabelText('验证码'), { target: { value: 'WRONG' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));
@@ -93,7 +93,7 @@ describe('Login Page', () => {
 
   it('logs in as admin with correct credentials', async () => {
     render(<LoginPage />);
-    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: '管理员' } });
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'admin' } });
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
     fireEvent.change(screen.getByLabelText('验证码'), { target: { value: 'ABCD' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));
@@ -106,7 +106,7 @@ describe('Login Page', () => {
 
   it('logs in as user with correct credentials via username', async () => {
     render(<LoginPage />);
-    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: '张三' } });
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'zhangsan' } });
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
     fireEvent.change(screen.getByLabelText('验证码'), { target: { value: 'ABCD' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));
@@ -132,7 +132,7 @@ describe('Login Page', () => {
 
   it('logs in as counselor with correct credentials', async () => {
     render(<LoginPage />);
-    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: '王职业' } });
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'wangzhiye' } });
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: '123456' } });
     fireEvent.change(screen.getByLabelText('验证码'), { target: { value: 'ABCD' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));

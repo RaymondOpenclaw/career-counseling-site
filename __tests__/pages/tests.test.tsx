@@ -9,7 +9,7 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 describe('Tests Page', () => {
   beforeEach(() => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),

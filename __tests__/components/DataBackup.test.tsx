@@ -14,7 +14,7 @@ describe('DataBackup', () => {
   });
 
   it('exports all career_* localStorage data as JSON', () => {
-    localStorage.setItem('career_users', JSON.stringify([{ id: 'u1', username: '张三' }]));
+    localStorage.setItem('career_users', JSON.stringify([{ id: 'u1', username: 'zhangsan' }]));
     localStorage.setItem('career_appointments', JSON.stringify([{ id: 'ap1', status: 'pending' }]));
     localStorage.setItem('career_auth_id', 'u1');
     localStorage.setItem('other_key', 'should-not-be-exported');

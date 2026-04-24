@@ -56,7 +56,7 @@ describe('Navbar component', () => {
 
   it('shows user info and logout when logged in as user', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -67,13 +67,13 @@ describe('Navbar component', () => {
     });
 
     render(<Navbar />);
-    expect(screen.getByText('张三')).toBeInTheDocument();
+    expect(screen.getByText('zhangsan')).toBeInTheDocument();
     expect(screen.getByText('退出')).toBeInTheDocument();
   });
 
   it('shows admin dashboard link when logged in as admin', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
+      user: { id: 'a1', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -89,7 +89,7 @@ describe('Navbar component', () => {
 
   it('shows counselor center link when logged in as counselor', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'c1', username: '王职业', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01' },
+      user: { id: 'c1', username: 'wangzhiye', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -106,7 +106,7 @@ describe('Navbar component', () => {
   it('calls logout when logout button is clicked', () => {
     const mockLogout = jest.fn();
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
       loading: false,
       login: jest.fn(),
       logout: mockLogout,

@@ -19,12 +19,12 @@ describe('useAuth hook', () => {
     localStorage.setItem(STORAGE_KEY, 'u1');
     // Pre-populate users in localStorage so useStore finds the user
     localStorage.setItem('career_users', JSON.stringify([
-      { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+      { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
     ]));
 
     const { result } = renderHook(() => useAuth());
     expect(result.current.user).toEqual(
-      expect.objectContaining({ id: 'u1', username: '张三', role: 'user' })
+      expect.objectContaining({ id: 'u1', username: 'zhangsan', role: 'user' })
     );
     expect(result.current.isLoggedIn).toBe(true);
     expect(result.current.isUser).toBe(true);
@@ -38,7 +38,7 @@ describe('useAuth hook', () => {
     });
 
     expect(result.current.user).toEqual(
-      expect.objectContaining({ id: 'u1', username: '张三', role: 'user' })
+      expect.objectContaining({ id: 'u1', username: 'zhangsan', role: 'user' })
     );
     expect(result.current.isLoggedIn).toBe(true);
     expect(localStorage.getItem(STORAGE_KEY)).toBe('u1');
@@ -61,7 +61,7 @@ describe('useAuth hook', () => {
 
   it('should correctly identify admin role when users array contains admin', () => {
     localStorage.setItem('career_users', JSON.stringify([
-      { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
+      { id: 'a1', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
     ]));
     const { result } = renderHook(() => useAuth());
 
@@ -76,7 +76,7 @@ describe('useAuth hook', () => {
 
   it('should correctly identify counselor role', () => {
     localStorage.setItem('career_users', JSON.stringify([
-      { id: 'c1', username: '王职业', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01' },
+      { id: 'c1', username: 'wangzhiye', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01' },
     ]));
     const { result } = renderHook(() => useAuth());
 

@@ -27,7 +27,7 @@ describe('CounselorDetailClient', () => {
     mockPush.mockClear();
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -76,7 +76,7 @@ describe('CounselorDetailClient', () => {
     expect(first.counselorId).toBe('c1');
     expect(first.counselorName).toBe('王职业');
     expect(first.userId).toBe('u1');
-    expect(first.userName).toBe('张三');
+    expect(first.userName).toBe('zhangsan');
     expect(first.note).toBe('测试备注');
     expect(first.status).toBe('pending');
   });

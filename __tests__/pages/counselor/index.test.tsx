@@ -9,7 +9,7 @@ describe('Counselor Dashboard', () => {
 
   it('displays appointment list', () => {
     render(<CounselorPage />);
-    expect(screen.getAllByText('张三').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('zhangsan').length).toBeGreaterThan(0);
   });
 
   it('displays appointment status', () => {

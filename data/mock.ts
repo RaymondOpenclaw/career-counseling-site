@@ -1,13 +1,13 @@
 import { User, Counselor, Article, Announcement, Banner, Test, TestResult, Appointment, Message } from '@/types';
 
 export const users: User[] = [
-  { id: 'u1', username: '张三', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-  { id: 'u2', username: '李四', email: 'lisi@example.com', role: 'user', createdAt: '2024-02-10', phone: '13800138002', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-  { id: 'a1', username: '管理员', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-  { id: 'uc1', username: '王职业', email: 'wang@example.com', role: 'counselor', createdAt: '2024-01-05', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-  { id: 'uc2', username: '李发展', email: 'li@example.com', role: 'counselor', createdAt: '2024-01-10', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-  { id: 'uc3', username: '陈心理', email: 'chen@example.com', role: 'counselor', createdAt: '2024-01-12', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
-  { id: 'uc4', username: '赵行业', email: 'zhao@example.com', role: 'counselor', createdAt: '2024-01-08', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'u1', username: 'zhangsan', email: 'zhangsan@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'u2', username: 'lisi', email: 'lisi@example.com', role: 'user', createdAt: '2024-02-10', phone: '13800138002', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'a1', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'uc1', username: 'wangzhiye', email: 'wang@example.com', role: 'counselor', createdAt: '2024-01-05', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'uc2', username: 'lizhan', email: 'li@example.com', role: 'counselor', createdAt: '2024-01-10', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'uc3', username: 'chenxinli', email: 'chen@example.com', role: 'counselor', createdAt: '2024-01-12', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
+  { id: 'uc4', username: 'zhaohangye', email: 'zhao@example.com', role: 'counselor', createdAt: '2024-01-08', passwordHash: '$2b$10$xQvAZ41SLy8J1T0Ti5XjLO0bGgYuQDKaCVzJW7H19kBqANuPQFtW6' },
 ];
 
 export const counselors: Counselor[] = [
@@ -175,8 +175,8 @@ export const testResults: TestResult[] = [
 ];
 
 export const appointments: Appointment[] = [
-  { id: 'ap1', userId: 'u1', userName: '张三', counselorId: 'c1', counselorName: '王职业', date: '2024-04-25', time: '14:00', status: 'confirmed', note: '想了解互联网行业转型', createdAt: '2024-04-18' },
-  { id: 'ap2', userId: 'u1', userName: '张三', counselorId: 'c2', counselorName: '李发展', date: '2024-04-20', time: '10:00', status: 'completed', note: '职场晋升困惑', createdAt: '2024-04-15' },
+  { id: 'ap1', userId: 'u1', userName: 'zhangsan', counselorId: 'c1', counselorName: '王职业', date: '2024-04-25', time: '14:00', status: 'confirmed', note: '想了解互联网行业转型', createdAt: '2024-04-18' },
+  { id: 'ap2', userId: 'u1', userName: 'zhangsan', counselorId: 'c2', counselorName: '李发展', date: '2024-04-20', time: '10:00', status: 'completed', note: '职场晋升困惑', createdAt: '2024-04-15' },
 ];
 
 export const messages: Message[] = [

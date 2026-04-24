@@ -21,7 +21,7 @@ describe('Profile Page', () => {
 
   it('renders profile page with user info tab active by default', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -35,13 +35,13 @@ describe('Profile Page', () => {
     expect(screen.getByRole('heading', { name: '个人中心' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '基本信息' })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: '修改密码' }).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByDisplayValue('张三')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('zhangsan')).toBeInTheDocument();
     expect(screen.getByDisplayValue('zs@example.com')).toBeInTheDocument();
   });
 
   it('shows createdAt as read-only', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -58,7 +58,7 @@ describe('Profile Page', () => {
 
   it('switches to password tab', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -77,7 +77,7 @@ describe('Profile Page', () => {
 
   it('shows toast on save info', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -94,7 +94,7 @@ describe('Profile Page', () => {
 
   it('shows toast when passwords do not match', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -116,7 +116,7 @@ describe('Profile Page', () => {
 
   it('shows toast on password change success', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -138,7 +138,7 @@ describe('Profile Page', () => {
 
   it('renders appointments tab button', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -154,7 +154,7 @@ describe('Profile Page', () => {
 
   it('switches to appointments tab and shows appointment list', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -173,7 +173,7 @@ describe('Profile Page', () => {
 
   it('shows empty state when no appointments', () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -191,7 +191,7 @@ describe('Profile Page', () => {
 
   it('shows confirm modal when switching tabs with unsaved info changes', async () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -202,7 +202,7 @@ describe('Profile Page', () => {
     });
 
     render(<ProfilePage />);
-    fireEvent.change(screen.getByDisplayValue('张三'), { target: { value: '李四' } });
+    fireEvent.change(screen.getByDisplayValue('zhangsan'), { target: { value: '李四' } });
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
 
     await waitFor(() => {
@@ -213,7 +213,7 @@ describe('Profile Page', () => {
 
   it('allows tab switch after confirming unsaved changes', async () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -224,7 +224,7 @@ describe('Profile Page', () => {
     });
 
     render(<ProfilePage />);
-    fireEvent.change(screen.getByDisplayValue('张三'), { target: { value: '李四' } });
+    fireEvent.change(screen.getByDisplayValue('zhangsan'), { target: { value: '李四' } });
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
 
     await waitFor(() => {
@@ -240,7 +240,7 @@ describe('Profile Page', () => {
 
   it('stays on current tab when cancelling unsaved changes warning', async () => {
     mockUseAuth.mockReturnValue({
-      user: { id: 'u1', username: '张三', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
       login: jest.fn(),
       logout: jest.fn(),
@@ -251,7 +251,7 @@ describe('Profile Page', () => {
     });
 
     render(<ProfilePage />);
-    fireEvent.change(screen.getByDisplayValue('张三'), { target: { value: '李四' } });
+    fireEvent.change(screen.getByDisplayValue('zhangsan'), { target: { value: '李四' } });
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
 
     await waitFor(() => {
