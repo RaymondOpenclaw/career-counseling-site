@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,6 +8,7 @@ import { users as mockUsers } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import Captcha, { CaptchaRef } from '@/components/Captcha';
 import { Eye, EyeOff } from 'lucide-react';
 import { validateField } from '@/lib/validation';
 import bcrypt from 'bcryptjs';
@@ -16,7 +17,8 @@ export default function Login() {
   const router = useRouter();
   const { login } = useAuth();
   const [users] = useStore('career_users', mockUsers);
-  const [form, setForm] = useState({ username: '', password: '' });
+  const captchaRef = useRef<CaptchaRef>(null);
+  const [form, setForm] = useState({ username: '', password: '', captcha: '' });
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -25,6 +27,7 @@ export default function Login() {
   const validationRules = {
     username: (value: string) => (value.trim() ? '' : '请输入用户名'),
     password: (value: string) => (value.length >= 6 ? '' : '密码至少需要6个字符'),
+    captcha: (value: string) => (value.trim() ? '' : '请输入验证码'),
   };
 
   const validate = (name: string, value: string) => {
@@ -52,8 +55,15 @@ export default function Login() {
       if (err) allErrors[key] = err;
     });
     setErrors(allErrors);
-    setTouched({ username: true, password: true });
+    setTouched({ username: true, password: true, captcha: true });
     if (Object.keys(allErrors).length > 0) return;
+
+    if (!captchaRef.current?.validate(form.captcha)) {
+      setError('验证码错误');
+      captchaRef.current?.refresh();
+      setForm((prev) => ({ ...prev, captcha: '' }));
+      return;
+    }
 
     const normalizedUsername = form.username === 'zhangsan' ? '张三' : form.username;
     const found = users.find(
@@ -68,7 +78,9 @@ export default function Login() {
       return;
     }
 
-    setError('用户名或密码错误（演示账号：张三/123456 或 管理员/123456）');
+    setError('用户名或密码错误');
+    captchaRef.current?.refresh();
+    setForm((prev) => ({ ...prev, captcha: '' }));
   };
 
   return (
@@ -119,6 +131,22 @@ export default function Login() {
                 </button>
               </div>
               {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
+            </div>
+            <div>
+              <label htmlFor="captcha" className="mb-1 block text-sm font-medium">验证码</label>
+              <div className="flex items-center gap-3">
+                <input
+                  id="captcha"
+                  type="text"
+                  placeholder="请输入验证码"
+                  value={form.captcha}
+                  onChange={(e) => handleChange('captcha', e.target.value)}
+                  onBlur={(e) => handleBlur('captcha', e.target.value)}
+                  className={`w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${errors.captcha ? 'border-destructive' : 'border-input'}`}
+                />
+                <Captcha ref={captchaRef} />
+              </div>
+              {errors.captcha && <p className="mt-1 text-xs text-destructive">{errors.captcha}</p>}
             </div>
             <button
               type="submit"
