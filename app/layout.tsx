@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import DataInitializer from "@/components/DataInitializer";
 
 export const metadata: Metadata = {
   title: "职引未来 - 专业职业生涯咨询平台",
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="min-h-screen bg-background font-sans antialiased">
+        <DataInitializer />
         {children}
       </body>
     </html>
