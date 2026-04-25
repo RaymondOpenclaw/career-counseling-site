@@ -1,6 +1,13 @@
 import { User, Counselor, Article, Announcement, Banner, Test, TestResult, Appointment, Message } from '@/types';
 
-export const users: User[] = [];
+export const users: User[] = [
+  { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01', passwordHash: '$2b$10$m6kqclE2XgJkd0T04IytCuswPfgafZQb4sAuyBRfZCRVfgp0ux5he' },
+  { id: 'u2', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01', passwordHash: '$2b$10$ZrsJYOmEHwvn/8wVSQYg8OZK07NKRNFDchZNy7GN0pa139kQxOQP.' },
+  { id: 'uc1', username: 'wangzhiye', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01', passwordHash: '$2b$10$4M1FBRtBpH3hzS/iyrZNjeJag49wTZ.qekFoSaaxRdb51CoG4ujKa' },
+  { id: 'uc2', username: 'lifazhan', email: 'lf@example.com', role: 'counselor', createdAt: '2024-01-01', passwordHash: '$2b$10$QCBHwnSj4N3NmO1LsfOCTOgdD6NlxLqaQMmauVkOjZDciy3Ror1.u' },
+  { id: 'uc3', username: 'chenxinli', email: 'cx@example.com', role: 'counselor', createdAt: '2024-01-01', passwordHash: '$2b$10$OPpl/leepIxOE6s.RQ3hUOTNjSFoMgiNb0plgJ295Y4xhNJrUkIPy' },
+  { id: 'uc4', username: 'zhaohangye', email: 'zh@example.com', role: 'counselor', createdAt: '2024-01-01', passwordHash: '$2b$10$8D9eCBpqZAX6a1W55QQ9BOysW/8AyTSM.XNDPVF2Nyd1W8I2Mv28i' },
+];
 
 export const counselors: Counselor[] = [
   {
