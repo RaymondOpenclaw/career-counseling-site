@@ -1,13 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { appointments as mockAppointments } from '@/data/mock';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { appointments as mockAppointments, counselors as mockCounselors } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
+import { useAuth } from '@/hooks/useAuth';
 import EmptyState from '@/components/EmptyState';
 import { Calendar, Clock, User, CheckCircle, XCircle, ClipboardList } from 'lucide-react';
 
 export default function CounselorPage() {
-  const [appointments, setAppointments] = useStore('career_appointments', mockAppointments);
+  const { user, isCounselor, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [allAppointments, setAllAppointments] = useStore('career_appointments', mockAppointments);
+  const counselor = mockCounselors.find((c) => c.userId === user?.id);
+  const appointments = allAppointments.filter((a) => a.counselorId === counselor?.id);
+
+  useEffect(() => {
+    if (!authLoading && !isCounselor) {
+      router.push('/');
+    }
+  }, [authLoading, isCounselor, router]);
+
+  if (authLoading || !isCounselor) return null;
 
   const statusMap: Record<string, string> = {
     pending: '待确认',
@@ -24,11 +38,11 @@ export default function CounselorPage() {
   };
 
   const handleConfirm = (id: string) => {
-    setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'confirmed' as const } : a)));
+    setAllAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'confirmed' as const } : a)));
   };
 
   const handleComplete = (id: string) => {
-    setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'completed' as const } : a)));
+    setAllAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'completed' as const } : a)));
   };
 
   return (

@@ -54,7 +54,7 @@ describe('Navbar component', () => {
     expect(screen.getByText('注册')).toBeInTheDocument();
   });
 
-  it('shows user info and logout when logged in as user', () => {
+  it('shows user info, my appointments and logout when logged in as user', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
       loading: false,
@@ -68,10 +68,13 @@ describe('Navbar component', () => {
 
     render(<Navbar />);
     expect(screen.getByText('zhangsan')).toBeInTheDocument();
+    expect(screen.getByText('我的预约')).toBeInTheDocument();
     expect(screen.getByText('退出')).toBeInTheDocument();
+    expect(screen.queryByText('咨询师中心')).not.toBeInTheDocument();
+    expect(screen.queryByText('管理后台')).not.toBeInTheDocument();
   });
 
-  it('shows admin dashboard link when logged in as admin', () => {
+  it('shows admin dashboard link but not my appointments when logged in as admin', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'a1', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
       loading: false,
@@ -85,9 +88,11 @@ describe('Navbar component', () => {
 
     render(<Navbar />);
     expect(screen.getByText('管理后台')).toBeInTheDocument();
+    expect(screen.queryByText('我的预约')).not.toBeInTheDocument();
+    expect(screen.queryByText('咨询师中心')).not.toBeInTheDocument();
   });
 
-  it('shows counselor center link when logged in as counselor', () => {
+  it('shows counselor center link but not my appointments when logged in as counselor', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'c1', username: 'wangzhiye', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01' },
       loading: false,
@@ -101,6 +106,8 @@ describe('Navbar component', () => {
 
     render(<Navbar />);
     expect(screen.getByText('咨询师中心')).toBeInTheDocument();
+    expect(screen.queryByText('我的预约')).not.toBeInTheDocument();
+    expect(screen.queryByText('管理后台')).not.toBeInTheDocument();
   });
 
   it('calls logout when logout button is clicked', () => {

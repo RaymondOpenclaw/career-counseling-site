@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -12,8 +14,11 @@ import EmptyState from '@/components/EmptyState';
 import { Calendar, Clock, User, MessageSquare, Filter, Eye, Pencil, Trash2, ChevronDown, ChevronUp, CalendarPlus } from 'lucide-react';
 
 export default function AppointmentsPage() {
+  const { user, isUser, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [filter, setFilter] = useState('全部');
-  const [appointments, setAppointments] = useStore('career_appointments', mockAppointments);
+  const [allAppointments, setAllAppointments] = useStore('career_appointments', mockAppointments);
+  const appointments = allAppointments.filter((a) => a.userId === user?.id);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ date: '', time: '', note: '' });
@@ -24,6 +29,14 @@ export default function AppointmentsPage() {
     message: '',
     onConfirm: () => {},
   });
+
+  useEffect(() => {
+    if (!authLoading && !isUser) {
+      router.push('/');
+    }
+  }, [authLoading, isUser, router]);
+
+  if (authLoading || !isUser) return null;
 
   const statusMap: Record<string, string> = {
     pending: '待确认',
@@ -51,7 +64,7 @@ export default function AppointmentsPage() {
       title: '删除预约',
       message: '确定删除此预约吗？删除后不可恢复。',
       onConfirm: () => {
-        setAppointments((prev) => prev.filter((a) => a.id !== id));
+        setAllAppointments((prev) => prev.filter((a) => a.id !== id));
         if (expandedId === id) setExpandedId(null);
         setToast({ message: '预约已删除', type: 'success' });
       },
@@ -64,7 +77,7 @@ export default function AppointmentsPage() {
       title: '取消预约',
       message: '确定取消此预约吗？',
       onConfirm: () => {
-        setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' as const } : a)));
+        setAllAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' as const } : a)));
         setToast({ message: '预约已取消', type: 'success' });
       },
     });
@@ -85,7 +98,7 @@ export default function AppointmentsPage() {
       title: '保存修改',
       message: '确定保存修改吗？',
       onConfirm: () => {
-        setAppointments((prev) =>
+        setAllAppointments((prev) =>
           prev.map((a) =>
             a.id === editingId
               ? { ...a, date: editForm.date, time: editForm.time, note: editForm.note }

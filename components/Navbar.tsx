@@ -8,7 +8,7 @@ import { Menu, X, User, LogOut, LayoutDashboard, MessageSquare, ClipboardList } 
 import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
-  const { user, logout, isLoggedIn, isAdmin, isCounselor } = useAuth();
+  const { user, logout, isLoggedIn, isAdmin, isCounselor, isUser } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -49,13 +49,15 @@ export default function Navbar() {
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
               <NotificationBell />
-              <Link
-                href="/appointments"
-                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary"
-              >
-                <ClipboardList className="h-4 w-4" />
-                我的预约
-              </Link>
+              {isUser && (
+                <Link
+                  href="/appointments"
+                  className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary"
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  我的预约
+                </Link>
+              )}
               {(isAdmin || isCounselor) && (
                 <Link
                   href={isAdmin ? '/admin' : '/counselor'}
@@ -123,9 +125,11 @@ export default function Navbar() {
             ))}
             {isLoggedIn ? (
               <>
-                <Link href="/appointments" onClick={() => setMobileOpen(false)} className="text-sm font-medium">
-                  我的预约
-                </Link>
+                {isUser && (
+                  <Link href="/appointments" onClick={() => setMobileOpen(false)} className="text-sm font-medium">
+                    我的预约
+                  </Link>
+                )}
                 <Link href="/profile" onClick={() => setMobileOpen(false)} className="text-sm font-medium">
                   个人中心
                 </Link>

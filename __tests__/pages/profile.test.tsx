@@ -136,7 +136,7 @@ describe('Profile Page', () => {
     expect(screen.getByText('密码修改成功（演示模式）')).toBeInTheDocument();
   });
 
-  it('renders appointments tab button', () => {
+  it('renders appointments tab button for user role', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15' },
       loading: false,
@@ -150,6 +150,38 @@ describe('Profile Page', () => {
 
     render(<ProfilePage />);
     expect(screen.getByRole('button', { name: '我的预约' })).toBeInTheDocument();
+  });
+
+  it('does not render appointments tab for counselor role', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'uc1', username: 'wangzhiye', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-15' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: true,
+      isUser: false,
+      isLoggedIn: true,
+    });
+
+    render(<ProfilePage />);
+    expect(screen.queryByRole('button', { name: '我的预约' })).not.toBeInTheDocument();
+  });
+
+  it('does not render appointments tab for admin role', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u2', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-15' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: true,
+      isCounselor: false,
+      isUser: false,
+      isLoggedIn: true,
+    });
+
+    render(<ProfilePage />);
+    expect(screen.queryByRole('button', { name: '我的预约' })).not.toBeInTheDocument();
   });
 
   it('switches to appointments tab and shows appointment list', () => {

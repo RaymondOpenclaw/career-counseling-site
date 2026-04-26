@@ -15,14 +15,15 @@ import DataBackup from '@/components/DataBackup';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, isUser } = useAuth();
   const [form, setForm] = useState({
     username: user?.username || '',
     email: user?.email || '',
     phone: user?.phone || '',
   });
   const [pwdForm, setPwdForm] = useState({ old: '', new: '', confirm: '' });
-  const [activeTab, setActiveTab] = useState<'info' | 'password' | 'appointments'>('info');
+  type TabType = 'info' | 'password' | 'appointments';
+  const [activeTab, setActiveTab] = useState<TabType>('info');
   const [appointments] = useStore('career_appointments', mockAppointments);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState({
@@ -42,7 +43,7 @@ export default function Profile() {
 
   useUnsavedChanges(isDirty);
 
-  const handleTabChange = (tab: 'info' | 'password' | 'appointments') => {
+  const handleTabChange = (tab: TabType) => {
     if (isDirty && tab !== activeTab) {
       setPendingTab(tab);
       setConfirmModal((prev) => ({ ...prev, isOpen: true }));
@@ -100,12 +101,14 @@ export default function Profile() {
             >
               修改密码
             </button>
-            <button
-              onClick={() => handleTabChange('appointments')}
-              className={`rounded-md px-4 py-2 text-sm font-medium ${activeTab === 'appointments' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-accent'}`}
-            >
-              我的预约
-            </button>
+            {isUser && (
+              <button
+                onClick={() => handleTabChange('appointments')}
+                className={`rounded-md px-4 py-2 text-sm font-medium ${activeTab === 'appointments' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-accent'}`}
+              >
+                我的预约
+              </button>
+            )}
           </div>
 
           {activeTab === 'info' && (

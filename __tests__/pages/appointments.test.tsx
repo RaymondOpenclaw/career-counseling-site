@@ -1,20 +1,94 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import AppointmentsPage from '@/app/appointments/page';
 import { appointments as mockAppointments } from '@/data/mock';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+
+jest.mock('@/hooks/useAuth');
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+  usePathname: jest.fn(() => '/appointments'),
+}));
+
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 
 describe('Appointments Page', () => {
+  const mockPush = jest.fn();
+
   beforeEach(() => {
     localStorage.setItem('career_appointments', JSON.stringify(mockAppointments));
+    mockUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('renders page heading and description', () => {
+  it('renders page heading and description for user role', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: false,
+      isUser: true,
+      isLoggedIn: true,
+    });
+
     render(<AppointmentsPage />);
     expect(screen.getByRole('heading', { name: '我的预约' })).toBeInTheDocument();
     expect(screen.getByText('管理你的咨询师预约记录')).toBeInTheDocument();
+  });
+
+  it('redirects non-user roles to home page', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'uc1', username: 'wangzhiye', email: 'wz@example.com', role: 'counselor', createdAt: '2024-01-01' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: true,
+      isUser: false,
+      isLoggedIn: true,
+    });
+
+    render(<AppointmentsPage />);
+    expect(mockPush).toHaveBeenCalledWith('/');
+  });
+
+  it('redirects admin to home page', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u2', username: 'admin', email: 'admin@example.com', role: 'admin', createdAt: '2024-01-01' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: true,
+      isCounselor: false,
+      isUser: false,
+      isLoggedIn: true,
+    });
+
+    render(<AppointmentsPage />);
+    expect(mockPush).toHaveBeenCalledWith('/');
+  });
+
+  it('shows only appointments belonging to current user', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
+      loading: false,
+      login: jest.fn(),
+      logout: jest.fn(),
+      isAdmin: false,
+      isCounselor: false,
+      isUser: true,
+      isLoggedIn: true,
+    });
+
+    render(<AppointmentsPage />);
+    expect(screen.getByText(/王职业/)).toBeInTheDocument();
+    expect(screen.getByText(/李发展/)).toBeInTheDocument();
   });
 
   it('renders appointment list with status filters', () => {
