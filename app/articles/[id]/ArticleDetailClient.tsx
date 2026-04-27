@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { articles as mockArticles } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { ArrowLeft, Eye, Heart, User, Calendar } from 'lucide-react';
 
 export default function ArticleDetailClient({ id }: { id: string }) {
@@ -14,16 +12,13 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   if (!article) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Navbar />
         <main className="flex-1 py-20 text-center text-muted-foreground">文章不存在</main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-3xl px-4">
           <Link href="/articles" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
@@ -48,7 +43,6 @@ export default function ArticleDetailClient({ id }: { id: string }) {
           </article>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

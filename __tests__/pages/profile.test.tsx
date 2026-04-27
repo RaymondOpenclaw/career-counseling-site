@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfilePage from '@/app/profile/page';
 import { useAuth } from '@/hooks/useAuth';
 import { appointments as mockAppointments } from '@/data/mock';
+import { ToastProvider } from '@/components/ToastProvider';
 
 jest.mock('@/hooks/useAuth');
 jest.mock('@/hooks/useUnsavedChanges', () => ({
@@ -19,6 +20,8 @@ describe('Profile Page', () => {
     jest.restoreAllMocks();
   });
 
+  const renderPage = () => render(<ProfilePage />, { wrapper: ToastProvider });
+
   it('renders profile page with user info tab active by default', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-15', phone: '13800138001' },
@@ -31,7 +34,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     expect(screen.getByRole('heading', { name: '个人中心' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '基本信息' })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: '修改密码' }).length).toBeGreaterThanOrEqual(1);
@@ -51,7 +54,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     const createdAtInput = screen.getByDisplayValue('2024-01-15');
     expect(createdAtInput).toHaveAttribute('readOnly');
   });
@@ -68,7 +71,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
     expect(screen.getByLabelText('原密码')).toBeInTheDocument();
     expect(screen.getByLabelText('新密码')).toBeInTheDocument();
@@ -87,7 +90,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: /保存修改/ }));
     expect(screen.getByText('保存成功（演示模式）')).toBeInTheDocument();
   });
@@ -104,7 +107,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
     fireEvent.change(screen.getByLabelText('原密码'), { target: { value: 'oldpwd' } });
     fireEvent.change(screen.getByLabelText('新密码'), { target: { value: 'newpwd1' } });
@@ -126,7 +129,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
     fireEvent.change(screen.getByLabelText('原密码'), { target: { value: '123456' } });
     fireEvent.change(screen.getByLabelText('新密码'), { target: { value: 'newpwd' } });
@@ -148,7 +151,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     expect(screen.getByRole('button', { name: '我的预约' })).toBeInTheDocument();
   });
 
@@ -164,7 +167,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     expect(screen.queryByRole('button', { name: '我的预约' })).not.toBeInTheDocument();
   });
 
@@ -180,7 +183,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     expect(screen.queryByRole('button', { name: '我的预约' })).not.toBeInTheDocument();
   });
 
@@ -196,7 +199,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: '我的预约' }));
     expect(screen.getByText(/王职业/)).toBeInTheDocument();
     expect(screen.getByText(/李发展/)).toBeInTheDocument();
@@ -216,7 +219,7 @@ describe('Profile Page', () => {
     });
 
     localStorage.setItem('career_appointments', JSON.stringify([]));
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: '我的预约' }));
     expect(screen.getByText('暂无预约记录')).toBeInTheDocument();
   });
@@ -233,7 +236,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.change(screen.getByDisplayValue('zhangsan'), { target: { value: '李四' } });
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
 
@@ -255,7 +258,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.change(screen.getByDisplayValue('zhangsan'), { target: { value: '李四' } });
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
 
@@ -282,7 +285,7 @@ describe('Profile Page', () => {
       isLoggedIn: true,
     });
 
-    render(<ProfilePage />);
+    renderPage();
     fireEvent.change(screen.getByDisplayValue('zhangsan'), { target: { value: '李四' } });
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
 

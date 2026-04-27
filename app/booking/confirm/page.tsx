@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { CheckCircle, Calendar, Clock, User, ArrowRight, Home } from 'lucide-react';
 
 interface LastBooking {
@@ -29,7 +27,6 @@ export default function BookingConfirmPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex flex-1 items-center justify-center bg-muted/20 py-12">
         <div className="w-full max-w-md rounded-xl border bg-white p-8 shadow-sm text-center">
           {booking ? (
@@ -90,7 +87,6 @@ export default function BookingConfirmPage() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

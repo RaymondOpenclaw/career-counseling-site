@@ -5,8 +5,6 @@ import { useState } from 'react';
 import { counselors as mockCounselors, appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { useAuth } from '@/hooks/useAuth';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Star, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import AvailabilityCalendar from '@/components/AvailabilityCalendar';
@@ -23,9 +21,7 @@ export default function CounselorDetailClient({ id }: { id: string }) {
   if (!counselor) {
     return (
       <div className="flex min-h-screen flex-col">
-        <Navbar />
         <main className="flex-1 py-20 text-center text-muted-foreground">咨询师不存在</main>
-        <Footer />
       </div>
     );
   }
@@ -59,7 +55,6 @@ export default function CounselorDetailClient({ id }: { id: string }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-4xl px-4">
           <Link href="/counselors" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
@@ -152,7 +147,6 @@ export default function CounselorDetailClient({ id }: { id: string }) {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { tests as mockTests, testResults as mockTestResults } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { useAuth } from '@/hooks/useAuth';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { TestTube, Clock, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function TestsPage() {
@@ -43,7 +41,6 @@ export default function TestsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-4xl px-4">
           {!activeTest ? (
@@ -153,7 +150,6 @@ export default function TestsPage() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

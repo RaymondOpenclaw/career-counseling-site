@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { counselors as mockCounselors, articles as mockArticles, announcements as mockAnnouncements } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Star, Calendar, FileText, TestTube, ArrowRight, User, Bell } from 'lucide-react';
 
 export default function Home() {
@@ -16,7 +14,6 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -182,8 +179,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

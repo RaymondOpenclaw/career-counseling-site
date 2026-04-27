@@ -67,9 +67,9 @@ describe('Navbar component', () => {
     });
 
     render(<Navbar />);
-    expect(screen.getByText('zhangsan')).toBeInTheDocument();
     expect(screen.getByText('我的预约')).toBeInTheDocument();
     expect(screen.getByText('退出')).toBeInTheDocument();
+    expect(screen.queryByText('zhangsan')).not.toBeInTheDocument();
     expect(screen.queryByText('咨询师中心')).not.toBeInTheDocument();
     expect(screen.queryByText('管理后台')).not.toBeInTheDocument();
   });

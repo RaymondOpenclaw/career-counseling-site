@@ -5,15 +5,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStore } from '@/hooks/useStore';
 import { appointments as mockAppointments, users as mockUsers } from '@/data/mock';
 import bcrypt from 'bcryptjs';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { User, Mail, Phone, Calendar, Lock, Save, ClipboardList, Clock, ArrowRight, CalendarPlus } from 'lucide-react';
-import Toast from '@/components/Toast';
+import { useToast } from '@/components/ToastProvider';
 import ConfirmModal from '@/components/ConfirmModal';
 import EmptyState from '@/components/EmptyState';
 import DataBackup from '@/components/DataBackup';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { appointmentStatusMap as statusMap, appointmentStatusColor as statusColor } from '@/lib/appointment-status';
 
 export default function Profile() {
   const { user, isUser } = useAuth();
@@ -27,7 +26,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<TabType>('info');
   const [appointments] = useStore('career_appointments', mockAppointments);
   const [users, setUsers] = useStore('career_users', mockUsers);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { showToast } = useToast();
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     title: '未保存的更改',
@@ -54,45 +53,31 @@ export default function Profile() {
     setActiveTab(tab);
   };
 
-  const statusMap: Record<string, string> = {
-    pending: '待确认',
-    confirmed: '已确认',
-    completed: '已完成',
-    cancelled: '已取消',
-  };
-
-  const statusColor: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700',
-    confirmed: 'bg-blue-100 text-blue-700',
-    completed: 'bg-green-100 text-green-700',
-    cancelled: 'bg-gray-100 text-gray-700',
-  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setToast({ message: '保存成功（演示模式）', type: 'success' });
+    showToast('保存成功（演示模式）');
   };
 
   const handleChangePwd = (e: React.FormEvent) => {
     e.preventDefault();
     if (pwdForm.new !== pwdForm.confirm) {
-      setToast({ message: '两次输入的新密码不一致', type: 'error' });
+      showToast('两次输入的新密码不一致', 'error');
       return;
     }
     const currentUser = users.find((u) => u.id === user?.id);
     if (!currentUser?.passwordHash || !bcrypt.compareSync(pwdForm.old, currentUser.passwordHash)) {
-      setToast({ message: '原密码错误', type: 'error' });
+      showToast('原密码错误', 'error');
       return;
     }
     const newHash = bcrypt.hashSync(pwdForm.new, 10);
     setUsers((prev) => prev.map((u) => (u.id === user?.id ? { ...u, passwordHash: newHash } : u)));
-    setToast({ message: '密码修改成功', type: 'success' });
+    showToast('密码修改成功');
     setPwdForm({ old: '', new: '', confirm: '' });
   };
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-2xl px-4">
           <h1 className="mb-6 text-2xl font-bold">个人中心</h1>
@@ -280,15 +265,6 @@ export default function Profile() {
           </div>
         </div>
       </main>
-      <Footer />
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         title={confirmModal.title}

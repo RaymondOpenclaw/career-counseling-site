@@ -4,8 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { articles as mockArticles } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { FileText, Eye, Heart, User, Search } from 'lucide-react';
 
 export default function ArticlesPage() {
@@ -24,7 +22,6 @@ export default function ArticlesPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-8">
@@ -89,7 +86,6 @@ export default function ArticlesPage() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

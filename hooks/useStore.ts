@@ -8,12 +8,19 @@ const LOCAL_EVENT = 'store-sync';
 // Module-level event bus for intra-tab synchronization (works in jsdom and all browsers)
 const localBus = typeof window !== 'undefined' ? new EventTarget() : null;
 
-export function useStore<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] {
+export function useStore<T>(
+  key: string,
+  initialValue: T,
+  guard?: (value: unknown) => boolean
+): [T, (value: T | ((prev: T) => T)) => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') return initialValue;
     try {
       const item = window.localStorage.getItem(key);
-      if (item) return JSON.parse(item);
+      if (item) {
+        const parsed = JSON.parse(item);
+        if (!guard || guard(parsed)) return parsed;
+      }
       window.localStorage.setItem(key, JSON.stringify(initialValue));
       return initialValue;
     } catch {
@@ -30,7 +37,9 @@ export function useStore<T>(key: string, initialValue: T): [T, (value: T | ((pre
     const handleLocal = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail?.key === key) {
-        setStoredValue(detail.value);
+        if (!guard || guard(detail.value)) {
+          setStoredValue(detail.value);
+        }
       }
     };
     localBus?.addEventListener(LOCAL_EVENT, handleLocal);
@@ -40,7 +49,9 @@ export function useStore<T>(key: string, initialValue: T): [T, (value: T | ((pre
       bcRef.current = new BroadcastChannel(CHANNEL_NAME);
       bcRef.current.onmessage = (event) => {
         if (event.data?.key === key) {
-          setStoredValue(event.data.value);
+          if (!guard || guard(event.data.value)) {
+            setStoredValue(event.data.value);
+          }
         }
       };
     }
@@ -49,7 +60,10 @@ export function useStore<T>(key: string, initialValue: T): [T, (value: T | ((pre
     const handleStorage = (e: StorageEvent) => {
       if (e.key === key && e.newValue) {
         try {
-          setStoredValue(JSON.parse(e.newValue));
+          const parsed = JSON.parse(e.newValue);
+          if (!guard || guard(parsed)) {
+            setStoredValue(parsed);
+          }
         } catch {
           // ignore parse error
         }
@@ -71,7 +85,8 @@ export function useStore<T>(key: string, initialValue: T): [T, (value: T | ((pre
         try {
           const latest = window.localStorage.getItem(key);
           if (latest !== null) {
-            base = JSON.parse(latest);
+            const parsed = JSON.parse(latest);
+            if (!guard || guard(parsed)) base = parsed;
           }
         } catch {
           // ignore parse error, fall back to prev

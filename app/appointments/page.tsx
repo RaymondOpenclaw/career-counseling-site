@@ -6,12 +6,11 @@ import { useStore } from '@/hooks/useStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useRequireRole } from '@/hooks/useRequireRole';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import ConfirmModal from '@/components/ConfirmModal';
-import Toast from '@/components/Toast';
+import { useToast } from '@/components/ToastProvider';
 import EmptyState from '@/components/EmptyState';
 import { Calendar, Clock, User, MessageSquare, Filter, Eye, Pencil, Trash2, ChevronDown, ChevronUp, CalendarPlus } from 'lucide-react';
+import { appointmentStatusMap as statusMap, appointmentStatusColor as statusColor } from '@/lib/appointment-status';
 
 export default function AppointmentsPage() {
   const { user, loading: authLoading } = useRequireRole('user');
@@ -21,7 +20,7 @@ export default function AppointmentsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ date: '', time: '', note: '' });
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { showToast } = useToast();
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     title: '',
@@ -31,19 +30,6 @@ export default function AppointmentsPage() {
 
   if (authLoading || !user) return null;
 
-  const statusMap: Record<string, string> = {
-    pending: '待确认',
-    confirmed: '已确认',
-    completed: '已完成',
-    cancelled: '已取消',
-  };
-
-  const statusColor: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700',
-    confirmed: 'bg-blue-100 text-blue-700',
-    completed: 'bg-green-100 text-green-700',
-    cancelled: 'bg-gray-100 text-gray-700',
-  };
 
   const filtered = filter === '全部' ? appointments : appointments.filter((a) => statusMap[a.status] === filter || a.status === filter);
 
@@ -59,7 +45,7 @@ export default function AppointmentsPage() {
       onConfirm: () => {
         setAllAppointments((prev) => prev.filter((a) => a.id !== id));
         if (expandedId === id) setExpandedId(null);
-        setToast({ message: '预约已删除', type: 'success' });
+        showToast('预约已删除');
       },
     });
   };
@@ -71,7 +57,7 @@ export default function AppointmentsPage() {
       message: '确定取消此预约吗？',
       onConfirm: () => {
         setAllAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' as const } : a)));
-        setToast({ message: '预约已取消', type: 'success' });
+        showToast('预约已取消');
       },
     });
   };
@@ -99,20 +85,14 @@ export default function AppointmentsPage() {
           )
         );
         setEditingId(null);
-        setToast({ message: '修改已保存', type: 'success' });
+        showToast('修改已保存');
       },
     });
   };
 
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-5xl px-4">
           <div className="mb-8">
@@ -301,10 +281,6 @@ export default function AppointmentsPage() {
         }}
         onCancel={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
       />
-
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
-      <Footer />
     </div>
   );
 }

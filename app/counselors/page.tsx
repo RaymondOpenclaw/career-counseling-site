@@ -4,8 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { counselors as mockCounselors } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import EmptyState from '@/components/EmptyState';
 import { Star, Search, Filter, SlidersHorizontal, Frown } from 'lucide-react';
 
@@ -42,7 +40,6 @@ export default function CounselorsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-12">
         <div className="mx-auto max-w-7xl px-4">
           <div className="mb-8">
@@ -190,7 +187,6 @@ export default function CounselorsPage() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

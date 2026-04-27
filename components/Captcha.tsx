@@ -85,7 +85,7 @@ const Captcha = forwardRef<CaptchaRef>((_props, ref) => {
 
   return (
     <div className="flex items-center gap-2">
-      <canvas ref={canvasRef} width={120} height={40} className="rounded border" data-testid="captcha-canvas" />
+      <canvas ref={canvasRef} width={120} height={40} className="rounded border" data-testid="captcha-canvas" data-code={code} />
       <button
         type="button"
         onClick={refresh}

@@ -18,7 +18,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'PORT=4000 npm run dev',
+    command: 'npx serve -l 4000 out',
     url: 'http://localhost:4000',
     reuseExistingServer: !process.env.CI,
   },

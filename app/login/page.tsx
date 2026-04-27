@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { users as mockUsers } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Captcha, { CaptchaRef } from '@/components/Captcha';
 import { Eye, EyeOff } from 'lucide-react';
 import { validateField } from '@/lib/validation';
@@ -84,7 +82,6 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex flex-1 items-center justify-center bg-muted/20 py-12">
         <div className="w-full max-w-md rounded-xl border bg-white p-8 shadow-sm">
           <h1 className="mb-2 text-2xl font-bold">欢迎回来</h1>
@@ -163,7 +160,6 @@ export default function Login() {
           </p>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

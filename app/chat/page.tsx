@@ -4,8 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { counselors as mockCounselors, messages as mockMessages } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Send, User } from 'lucide-react';
 
 export default function ChatPage() {
@@ -55,7 +53,6 @@ export default function ChatPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1 bg-muted/20 py-6">
         <div className="mx-auto flex h-[calc(100vh-200px)] max-w-5xl gap-4 px-4">
           {/* 左侧列表 */}
@@ -127,7 +124,6 @@ export default function ChatPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

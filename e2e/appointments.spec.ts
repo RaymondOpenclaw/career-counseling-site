@@ -1,13 +1,18 @@
 import { test, expect } from '@playwright/test';
 
+async function loginAsUser(page: any) {
+  await page.goto('/login');
+  await page.fill('input[type="text"]', 'zhangsan');
+  await page.fill('input[type="password"]', '123456');
+  const captchaCode = await page.locator('[data-testid="captcha-canvas"]').getAttribute('data-code');
+  await page.fill('input#captcha', captchaCode || '');
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL('/');
+}
+
 test.describe('用户预约管理', () => {
   test.beforeEach(async ({ page }) => {
-    // 用户登录
-    await page.goto('/login');
-    await page.fill('input[type="text"]', 'zhangsan');
-    await page.fill('input[type="password"]', '123456');
-    await page.click('button[type="submit"]');
-    await expect(page).toHaveURL('/');
+    await loginAsUser(page);
   });
 
   test('应能查看预约列表', async ({ page }) => {
@@ -56,12 +61,11 @@ test.describe('用户预约管理', () => {
     await page.selectOption('select#editTime', '14:00');
     await page.fill('textarea#editNote', '修改后的备注内容');
 
-    page.on('dialog', async (dialog) => {
-      expect(dialog.message()).toContain('确定保存修改');
-      await dialog.accept();
-    });
-
     await page.getByRole('button', { name: '保存修改' }).click();
+
+    await expect(page.getByText('确定保存修改吗？')).toBeVisible();
+    await page.getByRole('button', { name: '确认', exact: true }).click();
+
     await expect(page.getByRole('heading', { name: '修改预约' })).not.toBeVisible();
 
     await expect(page.getByText('2025-06-15').first()).toBeVisible();
@@ -82,12 +86,11 @@ test.describe('用户预约管理', () => {
 
     const firstAppointmentName = await page.getByText('王职业').first().textContent();
 
-    page.on('dialog', async (dialog) => {
-      expect(dialog.message()).toContain('确定删除此预约');
-      await dialog.accept();
-    });
-
     await page.getByRole('button', { name: /删除/ }).first().click();
+
+    await expect(page.getByText('确定删除此预约吗？')).toBeVisible();
+    await page.getByRole('button', { name: '确认', exact: true }).click();
+
     await expect(page.getByText(firstAppointmentName!).first()).not.toBeVisible();
   });
 
@@ -97,12 +100,11 @@ test.describe('用户预约管理', () => {
     const cancelBtn = page.getByText('取消预约').first();
     await expect(cancelBtn).toBeVisible();
 
-    page.on('dialog', async (dialog) => {
-      expect(dialog.message()).toContain('确定取消此预约');
-      await dialog.accept();
-    });
-
     await cancelBtn.click();
+
+    await expect(page.getByText('确定取消此预约吗？')).toBeVisible();
+    await page.getByRole('button', { name: '确认', exact: true }).click();
+
     await expect(page.getByText('已取消').first()).toBeVisible();
   });
 });

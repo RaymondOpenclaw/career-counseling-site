@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import DataInitializer from "@/components/DataInitializer";
+import { ToastProvider } from "@/components/ToastProvider";
+import PageLayout from "@/components/PageLayout";
 
 export const metadata: Metadata = {
   title: "职引未来 - 专业职业生涯咨询平台",
@@ -16,7 +18,9 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className="min-h-screen bg-background font-sans antialiased">
         <DataInitializer />
-        {children}
+        <ToastProvider>
+          <PageLayout>{children}</PageLayout>
+        </ToastProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import AppointmentsPage from '@/app/appointments/page';
 import { appointments as mockAppointments } from '@/data/mock';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { ToastProvider } from '@/components/ToastProvider';
 
 jest.mock('@/hooks/useAuth');
 jest.mock('next/navigation', () => ({
@@ -25,6 +26,8 @@ describe('Appointments Page', () => {
     jest.restoreAllMocks();
   });
 
+  const renderPage = () => render(<AppointmentsPage />, { wrapper: ToastProvider });
+
   it('renders page heading and description for user role', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 'u1', username: 'zhangsan', email: 'zs@example.com', role: 'user', createdAt: '2024-01-01' },
@@ -37,7 +40,7 @@ describe('Appointments Page', () => {
       isLoggedIn: true,
     });
 
-    render(<AppointmentsPage />);
+    renderPage();
     expect(screen.getByRole('heading', { name: '我的预约' })).toBeInTheDocument();
     expect(screen.getByText('管理你的咨询师预约记录')).toBeInTheDocument();
   });
@@ -54,7 +57,7 @@ describe('Appointments Page', () => {
       isLoggedIn: true,
     });
 
-    render(<AppointmentsPage />);
+    renderPage();
     expect(mockPush).toHaveBeenCalledWith('/');
   });
 
@@ -70,7 +73,7 @@ describe('Appointments Page', () => {
       isLoggedIn: true,
     });
 
-    render(<AppointmentsPage />);
+    renderPage();
     expect(mockPush).toHaveBeenCalledWith('/');
   });
 
@@ -86,13 +89,13 @@ describe('Appointments Page', () => {
       isLoggedIn: true,
     });
 
-    render(<AppointmentsPage />);
+    renderPage();
     expect(screen.getByText(/王职业/)).toBeInTheDocument();
     expect(screen.getByText(/李发展/)).toBeInTheDocument();
   });
 
   it('renders appointment list with status filters', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     expect(screen.getByRole('button', { name: '全部' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '待确认' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '已确认' })).toBeInTheDocument();
@@ -101,20 +104,20 @@ describe('Appointments Page', () => {
   });
 
   it('displays appointment details', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     expect(screen.getByText(/王职业/)).toBeInTheDocument();
     expect(screen.getByText(/李发展/)).toBeInTheDocument();
   });
 
   it('filters appointments by status', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: '已完成' }));
     expect(screen.queryByText(/王职业/)).not.toBeInTheDocument();
     expect(screen.getByText(/李发展/)).toBeInTheDocument();
   });
 
   it('allows cancelling a confirmed appointment', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     const cancelButtons = screen.getAllByText('取消预约');
     expect(cancelButtons.length).toBeGreaterThan(0);
     fireEvent.click(cancelButtons[0]);
@@ -124,7 +127,7 @@ describe('Appointments Page', () => {
   });
 
   it('shows appointment detail when clicking detail button', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     const detailButtons = screen.getAllByRole('button', { name: /详情/ });
     expect(detailButtons.length).toBeGreaterThan(0);
     fireEvent.click(detailButtons[0]);
@@ -139,7 +142,7 @@ describe('Appointments Page', () => {
   });
 
   it('hides appointment detail when clicking detail button again', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     const detailButtons = screen.getAllByRole('button', { name: /详情/ });
     fireEvent.click(detailButtons[0]);
     expect(screen.getByText('预约编号：')).toBeInTheDocument();
@@ -148,7 +151,7 @@ describe('Appointments Page', () => {
   });
 
   it('opens edit modal when clicking edit button', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     const editButtons = screen.getAllByRole('button', { name: /修改/ });
     expect(editButtons.length).toBeGreaterThan(0);
     fireEvent.click(editButtons[0]);
@@ -159,7 +162,7 @@ describe('Appointments Page', () => {
   });
 
   it('closes edit modal when clicking cancel', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     fireEvent.click(screen.getAllByRole('button', { name: /修改/ })[0]);
     expect(screen.getByRole('heading', { name: '修改预约' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: '取消', exact: true }));
@@ -167,7 +170,7 @@ describe('Appointments Page', () => {
   });
 
   it('saves edited appointment with confirmation', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     fireEvent.click(screen.getAllByRole('button', { name: /修改/ })[0]);
     fireEvent.change(screen.getByLabelText('日期'), { target: { value: '2024-12-01' } });
     fireEvent.change(screen.getByLabelText('时间'), { target: { value: '10:00' } });
@@ -182,7 +185,7 @@ describe('Appointments Page', () => {
   });
 
   it('deletes appointment with confirmation', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     expect(screen.getByText(/王职业/)).toBeInTheDocument();
     const deleteButtons = screen.getAllByRole('button', { name: /删除/ });
     expect(deleteButtons.length).toBeGreaterThan(0);
@@ -194,7 +197,7 @@ describe('Appointments Page', () => {
   });
 
   it('cancelling appointment updates status', () => {
-    render(<AppointmentsPage />);
+    renderPage();
     expect(screen.getAllByText('已确认').length).toBeGreaterThan(0);
     const cancelButtons = screen.getAllByText('取消预约');
     fireEvent.click(cancelButtons[0]);

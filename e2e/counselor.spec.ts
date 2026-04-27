@@ -38,9 +38,8 @@ test.describe('咨询师相关功能', () => {
     await page.goto('/counselors/c1');
     await page.getByText('立即预约').click();
 
-    await expect(page.getByText('预约咨询')).toBeVisible();
-    await expect(page.getByText('日期')).toBeVisible();
-    await expect(page.getByText('时间')).toBeVisible();
+    await expect(page.getByText('可预约时间')).toBeVisible();
+    await expect(page.getByRole('button', { name: '确认预约' })).toBeVisible();
   });
 
   test('文章列表页面应显示所有文章', async ({ page }) => {
