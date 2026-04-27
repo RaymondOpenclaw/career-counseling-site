@@ -128,12 +128,12 @@ describe('Profile Page', () => {
 
     render(<ProfilePage />);
     fireEvent.click(screen.getByRole('button', { name: '修改密码' }));
-    fireEvent.change(screen.getByLabelText('原密码'), { target: { value: 'oldpwd' } });
+    fireEvent.change(screen.getByLabelText('原密码'), { target: { value: '123456' } });
     fireEvent.change(screen.getByLabelText('新密码'), { target: { value: 'newpwd' } });
     fireEvent.change(screen.getByLabelText('确认新密码'), { target: { value: 'newpwd' } });
     fireEvent.click(screen.getAllByRole('button', { name: /修改密码/ })[1]);
 
-    expect(screen.getByText('密码修改成功（演示模式）')).toBeInTheDocument();
+    expect(screen.getByText('密码修改成功')).toBeInTheDocument();
   });
 
   it('renders appointments tab button for user role', () => {

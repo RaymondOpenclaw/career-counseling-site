@@ -4,7 +4,6 @@ test.describe('用户预约管理', () => {
   test.beforeEach(async ({ page }) => {
     // 用户登录
     await page.goto('/login');
-    await page.selectOption('select[name="role"]', 'user');
     await page.fill('input[type="text"]', 'zhangsan');
     await page.fill('input[type="password"]', '123456');
     await page.click('button[type="submit"]');

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect } from 'react';
+import { useRequireRole } from '@/hooks/useRequireRole';
 import {
   LayoutDashboard,
   Users,
@@ -31,19 +31,13 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout, isAdmin, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
+  const { loading: guardLoading } = useRequireRole('admin', '/login');
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !isAdmin) {
-      router.push('/login');
-    }
-  }, [loading, isAdmin, router]);
-
-  if (loading) return null;
-  if (!isAdmin) return null;
+  if (loading || guardLoading || !user) return null;
 
   return (
     <div className="flex min-h-screen bg-muted/20">

@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect, useState } from 'react';
+import { useRequireRole } from '@/hooks/useRequireRole';
+import { useState } from 'react';
 import { Calendar, MessageSquare, User, LogOut, Menu, X } from 'lucide-react';
 
 const navItems = [
@@ -13,19 +14,13 @@ const navItems = [
 ];
 
 export default function CounselorLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout, isCounselor, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
+  const { loading: guardLoading } = useRequireRole('counselor', '/login');
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !isCounselor) {
-      router.push('/login');
-    }
-  }, [loading, isCounselor, router]);
-
-  if (loading) return null;
-  if (!isCounselor) return null;
+  if (loading || guardLoading || !user) return null;
 
   return (
     <div className="flex min-h-screen bg-muted/20">

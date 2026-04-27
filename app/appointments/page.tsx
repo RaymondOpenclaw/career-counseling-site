@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { appointments as mockAppointments } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
 import { useAuth } from '@/hooks/useAuth';
+import { useRequireRole } from '@/hooks/useRequireRole';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -14,8 +14,7 @@ import EmptyState from '@/components/EmptyState';
 import { Calendar, Clock, User, MessageSquare, Filter, Eye, Pencil, Trash2, ChevronDown, ChevronUp, CalendarPlus } from 'lucide-react';
 
 export default function AppointmentsPage() {
-  const { user, isUser, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { user, loading: authLoading } = useRequireRole('user');
   const [filter, setFilter] = useState('全部');
   const [allAppointments, setAllAppointments] = useStore('career_appointments', mockAppointments);
   const appointments = allAppointments.filter((a) => a.userId === user?.id);
@@ -30,13 +29,7 @@ export default function AppointmentsPage() {
     onConfirm: () => {},
   });
 
-  useEffect(() => {
-    if (!authLoading && !isUser) {
-      router.push('/');
-    }
-  }, [authLoading, isUser, router]);
-
-  if (authLoading || !isUser) return null;
+  if (authLoading || !user) return null;
 
   const statusMap: Record<string, string> = {
     pending: '待确认',

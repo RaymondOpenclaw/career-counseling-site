@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useStore } from '@/hooks/useStore';
-import { appointments as mockAppointments } from '@/data/mock';
+import { appointments as mockAppointments, users as mockUsers } from '@/data/mock';
+import bcrypt from 'bcryptjs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -25,6 +26,7 @@ export default function Profile() {
   type TabType = 'info' | 'password' | 'appointments';
   const [activeTab, setActiveTab] = useState<TabType>('info');
   const [appointments] = useStore('career_appointments', mockAppointments);
+  const [users, setUsers] = useStore('career_users', mockUsers);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -77,7 +79,14 @@ export default function Profile() {
       setToast({ message: '两次输入的新密码不一致', type: 'error' });
       return;
     }
-    setToast({ message: '密码修改成功（演示模式）', type: 'success' });
+    const currentUser = users.find((u) => u.id === user?.id);
+    if (!currentUser?.passwordHash || !bcrypt.compareSync(pwdForm.old, currentUser.passwordHash)) {
+      setToast({ message: '原密码错误', type: 'error' });
+      return;
+    }
+    const newHash = bcrypt.hashSync(pwdForm.new, 10);
+    setUsers((prev) => prev.map((u) => (u.id === user?.id ? { ...u, passwordHash: newHash } : u)));
+    setToast({ message: '密码修改成功', type: 'success' });
     setPwdForm({ old: '', new: '', confirm: '' });
   };
 

@@ -1,27 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { appointments as mockAppointments, counselors as mockCounselors } from '@/data/mock';
 import { useStore } from '@/hooks/useStore';
-import { useAuth } from '@/hooks/useAuth';
+import { useRequireRole } from '@/hooks/useRequireRole';
 import EmptyState from '@/components/EmptyState';
 import { Calendar, Clock, User, CheckCircle, XCircle, ClipboardList } from 'lucide-react';
 
 export default function CounselorPage() {
-  const { user, isCounselor, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { user, loading: authLoading } = useRequireRole('counselor');
   const [allAppointments, setAllAppointments] = useStore('career_appointments', mockAppointments);
   const counselor = mockCounselors.find((c) => c.userId === user?.id);
   const appointments = allAppointments.filter((a) => a.counselorId === counselor?.id);
 
-  useEffect(() => {
-    if (!authLoading && !isCounselor) {
-      router.push('/');
-    }
-  }, [authLoading, isCounselor, router]);
-
-  if (authLoading || !isCounselor) return null;
+  if (authLoading || !user) return null;
 
   const statusMap: Record<string, string> = {
     pending: '待确认',

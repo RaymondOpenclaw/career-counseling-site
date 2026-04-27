@@ -9,9 +9,8 @@ test.describe('认证流程', () => {
 
   test('管理员登录后应能访问管理后台', async ({ page }) => {
     await page.goto('/login');
-    await page.selectOption('select[name="role"]', 'admin');
     await page.fill('input[type="text"]', 'admin');
-    await page.fill('input[type="password"]', '123456');
+    await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
 
     await expect(page).toHaveURL('/admin');
@@ -21,13 +20,12 @@ test.describe('认证流程', () => {
 
   test('用户登录后应显示用户名', async ({ page }) => {
     await page.goto('/login');
-    await page.selectOption('select[name="role"]', 'user');
     await page.fill('input[type="text"]', 'zhangsan');
     await page.fill('input[type="password"]', '123456');
     await page.click('button[type="submit"]');
 
     await expect(page).toHaveURL('/');
-    await expect(page.locator('text=张三').first()).toBeVisible();
+    await expect(page.getByText('zhangsan').first()).toBeVisible();
   });
 
   test('登录失败时应显示错误信息', async ({ page }) => {
@@ -65,12 +63,11 @@ test.describe('认证流程', () => {
 
   test('登出后应清除登录状态', async ({ page }) => {
     await page.goto('/login');
-    await page.selectOption('select[name="role"]', 'user');
     await page.fill('input[type="text"]', 'zhangsan');
     await page.fill('input[type="password"]', '123456');
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('text=张三').first()).toBeVisible();
+    await expect(page.getByText('zhangsan').first()).toBeVisible();
     await page.locator('text=退出').first().click();
 
     await expect(page.locator('text=登录').first()).toBeVisible();
